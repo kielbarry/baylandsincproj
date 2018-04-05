@@ -67,11 +67,12 @@
             </div>
 
             <div class="layout horizontal">
-              <paper-input label="Phone Number *"  auto-validate pattern="[^[0-9]+$"  error-message="This field only accepts numbers" prefix="+1" value="{{formData.phoneNumber}}">
+              <paper-input label="Phone Number *"  auto-validate pattern="^[0-9]+$"  error-message="This field only accepts numbers" 
+              value="{{ formData.phoneNumber }}">
               </paper-input>
               <paper-input class="secondInput" value="{{ formData.email }}" label="Email *" on-keyup="newEmail"></paper-input>
-              <iron-icon icon="icons:check-circle"></iron-icon>
-              <iron-icon icon="icons:cancel"></iron-icon>
+              <!-- <iron-icon icon="icons:check-circle"></iron-icon>
+              <iron-icon icon="icons:cancel"></iron-icon> -->
             </div>
 
             <div class="passwordRow layout horizontal">
@@ -113,67 +114,10 @@
             </div>
 
           </div>
-
-<!--           
-          <label>First Name *</label>
-          <paper-input is="iron-input" id="firstname" type="text" no-label-float value="{{formData.firstname}}" on-focusout="allFieldsInput"></paper-input>
-
-          <label>Last Name *</label>
-          <paper-input is="iron-input" id="lastname" type="text" no-label-float value="{{formData.lastname}}" on-focusout="allFieldsInput"></paper-input>
-
-          <label>Email *</label>
-          <paper-input is="iron-input" id="email" type="email" no-label-float value="{{formData.email}}" on-focusout="allFieldsInput"></paper-input>
-
-
-
-          <div class="layout horizontal">
-              <label>Password *</label>
-              <div id="invalidWarning" style="display: {{ conditionalCSS.invalidwarning }}">
-                Passwords must contain a number, uppercase and lowercase letter, a special char, and  be at least 8 chars long.
-              </div>
-          </div>
-          <paper-input is="iron-input" id="password" type="password" no-label-float value="{{formData.password}}" on-focusout="allFieldsInput" on-keyup="validatePassword"></paper-input>
-
-
-
-          <div class="layout horizontal">
-              <label>Repeat Password *</label>
-              <div id="passwordMatchWarning" style="display: {{ conditionalCSS.matchwarning }}">
-                Please ensure your passwords match
-              </div>
-          </div>
-          <paper-input is="iron-input" id="repeatpassword" type="password" no-label-float value="{{formData.repeatpassword}}" on-keyup="doPasswordsMatch" on-focusout="allFieldsInput"></paper-input>
-          <div id="blanksPresent" style="display: {{ conditionalCSS.blankswarning }}">Please fill in all fields to continue</div>
-
-
-          <label>Phone Number *</label>
-          <paper-input is="iron-input" id="phoneNumber" type="phone" no-label-float value="{{formData.phoneNumber}}" on-focusout="allFieldsInput"></paper-input>
-
-          <div class="wrapper-btns">
-              <paper-button id="sendSMSButton" raised class="link"
-              on-tap="sendSMSCode">Send SMS Verification</paper-button>
-          </div>
-
-
-          <google-recaptcha style="margin-top: 15px"
-            force-in-body
-            value="{{ formData.g-recaptcha-response}}"
-            sitekey="6LeGhz8UAAAAACUWRQ1J2aSPOVZ4ixXU5O_MvpHH"
-          ></google-recaptcha>
-
-          <div class="wrapper-btns">
-              <paper-button id="signUpButton" raised class="link" disabled="[[conditionalCSS.disabledbutton]]"
-              on-tap="signUp">Sign Up</paper-button>
-              <label> Already a user? </label>
-              <paper-button raised class="primary">Log In</paper-button>
-          </div>
- -->
       </div>    
   </div>
   
   <iron-ajax id="ajaxNewEmail" method="PUT" handle-as="json" content-type="application/json" on-response="availableEmail"></iron-ajax>
-
-
   <iron-ajax id="ajaxSignUp" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
   <iron-ajax id="ajaxRecaptcha" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
   <iron-ajax id="ajaxSMS" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
@@ -1198,7 +1142,7 @@
 
       newEmail() {
         var e = this.formData.email;
-        if(e.inclues("@") && e.includes(".com")) {
+        if(e.includes("@") && e.includes(".com")) {
           this.$.ajaxNewEmail.url = "/newEmail"
           this.$.ajaxNewEmail.body = JSON.stringify({"email":e});
           this.$.ajaxNewEmail.generateRequest();
