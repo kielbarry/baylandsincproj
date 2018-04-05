@@ -12,7 +12,8 @@ request = require("request"),
 URL = require("url-parser")
 redis = require("redis"),
 redisClient = redis.createClient(),
-handler = require("./backendFunctions/handlers.js");
+handler = require("./backendFunctions/handlers.js"),
+rcsk = process.env.recaptchaSecret;
 
 
 app
@@ -36,6 +37,23 @@ app.put("/newEmail", (req, res) => {
 		exists === 1 ? redisClient.HGET("emailList", req.body.email) : res.json({"valid": "true"})
 	})
 })
+
+app.put("/signup", (req, res) => {
+	if (!req.body) return res.sendStatus(400)
+	if([undefined, '', null].includes(req.body['g-recaptcha-response'])) {
+      return res.json({"responseCode" : 1,"responseDesc" : "Please select captcha"});
+ 	}
+	var verificationUrl = "https://www.google.com/recaptcha/api/siteverify?secret=" + rcsk + "&response=" + req.body['g-recaptcha-response'] + "&remoteip=" + req.connection.remoteAddress;
+	request(verificationUrl, (error, response, body) => {
+		body = JSON.parse(body);
+		if(body.success !== undefined && !body.success) {
+		  return res.json({"responseCode" : 1, "responseDesc" : body["error-codes"]});
+		}
+	})
+
+
+
+});
 
 
 app.put("/getBalances", (req, res) => {
