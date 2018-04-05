@@ -1,0 +1,45 @@
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="landing-page">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <div class="card">
+
+    </div>
+
+
+
+  </template>
+
+  <script>
+    class LandingPage extends Polymer.Element {
+      static get is() { return 'landing-page'; }
+
+      static get properties() {
+        return {
+
+        }
+      }
+
+      constructor() {
+        super();
+      }
+
+
+      ready(){
+        super.ready();
+        })
+      }
+
+    }
+
+    window.customElements.define(LandingPage.is, LandingPage);
+  </script>
+</dom-module>

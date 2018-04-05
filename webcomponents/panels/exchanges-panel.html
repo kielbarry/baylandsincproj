@@ -1,0 +1,175 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="exchanges-panel">
+  <template>
+    <style include="shared-styles iron-flex iron-flex-alignment">
+
+      app-toolbar {
+        background-color: #4285f4;
+        color: #fff;
+      }
+      app-drawer {
+        --app-drawer-content-container: {
+          background-color: #B0BEC5;
+        }
+      }
+      .drawer-contents {
+        height: 100%;
+        overflow-y: auto;
+      }
+
+      .singleExchange {
+        padding-left: 8px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        text-align: left;
+        font-size: 14px;
+      }
+
+      iron-icon {
+        height:12px;
+        width:12px;
+      }
+
+    </style>
+
+    <div id="exchangeList-container">
+
+      <h4 style="text-align:left; padding-left:8px">Please elect an exchange you would like to sync with</h4>
+
+      <iron-list items="[[exchangesList]]" as="item">
+        <template>
+          <div class="containerlayout horizontal" style="width: 100%">
+
+            <div id$="[[item.name]]">
+              <div class="singleExchange" on-tap="enterAPIPanel">
+                {{ item.name }}
+                <iron-icon icon="icons:info-outline"></iron-icon>  
+              </div>
+            </div>
+          </div>
+        </template>
+      </iron-list>
+    </div>
+    
+  </template>
+
+  <script>
+    class ExchangesPanel extends Polymer.Element {
+      static get is() { return 'exchanges-panel'; }
+
+      static get properties() {
+        return {
+          exchangesList: {
+            type: Array,
+            reflecToAttribute: true,
+            value: [
+              {
+                name: "Bitfinex", 
+                url: "https://www.bitfinex.com/api",
+                supported: "Not yet supported"
+
+              },
+              {
+                name: "coinone", 
+                url: "https://coinone.co.kr/",
+                supported: "Not yet supported"
+
+              },
+              {
+                name: "Kraken", 
+                url: "https://www.kraken.com/",
+                supported: "Not yet supported"
+
+              },
+              {
+                name: "Coinbase", 
+                url: "https://www.coinbase.com/settings/api",
+              },
+              {
+                name: "GDAX", 
+                url: "https://www.gdax.com/settings/api",
+                supported: "Currently supported"
+              },
+              {
+                name: "Bitstamp", 
+                url: "https://www.bitstamp.net/account/security/api/",
+                supported: "Not yet supported"
+
+              },
+              {
+                name: "Bithumb", 
+                url: "https://www.bithumb.com/",
+                supported: "Not yet supported"
+
+              },
+              {
+                name: "HitBTC", 
+                url: "https://hitbtc.com/",
+              },
+              {
+                name: "Bittrex", 
+                url: "https://bittrex.com/",
+                supported: "Not yet supported"
+              },
+              {
+                name: "Gemini", 
+                url: "https://gemini.com/",
+                supported: "Not yet supported"
+              },
+              {
+                name: "Quoine", 
+                url: "https://quoine.com/",
+                supported: "Not yet supported"
+              },
+              {
+                name: "bitFlyer", 
+                url: "https://bitflyer.com/",
+                supported: "Not yet supported"
+              },
+              {
+                name: "BTC-e / WEX", 
+                url: "https://wex.nz/",
+                supported: "Not yet supported"
+              },
+              {
+                name: "Poloniex", 
+                url: "https://poloniex.com/apiKeys",
+                supported: "Currently supported"
+              },
+              {
+                name: "Binance", 
+                url: "www.binance.com/‎",
+                supported: "Not yet supported"
+              },
+              {
+                name: "itBit", 
+                url: "https://www.itbit.com/",
+                supported: "Not yet supported"
+              },
+            ]
+          }
+        }
+      }
+
+      constructor() {
+        super();
+      }
+
+      enterAPIPanel(e) {
+        this.dispatchEvent(new CustomEvent('exchangeSelected', {
+          detail: {
+            selection: e.path[1].id
+          }
+        }));
+      }
+
+      ready(){
+        super.ready();
+      }
+
+    }
+
+    window.customElements.define(ExchangesPanel.is, ExchangesPanel);
+  </script>
+</dom-module>

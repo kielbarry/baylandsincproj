@@ -1,0 +1,232 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="enter-api-panel">
+  <template>
+    <style include="shared-styles iron-flex iron-flex-alignment">
+
+      app-toolbar {
+        background-color: #4285f4;
+        color: #fff;
+      }
+      app-drawer {
+        --app-drawer-content-container: {
+          background-color: #B0BEC5;
+        }
+      }
+      .drawer-contents {
+        height: 100%;
+        overflow-y: auto;
+      }
+
+      .wholeThing {
+        margin: 0 auto;
+        text-align: left;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+
+      paper-button {
+        background-color: #f7eec9;
+      }
+
+      iron-icon {
+        height:12px;
+        width:12px;
+      }
+
+      .instructions {
+        font-size: 14px;
+        text-align: left;
+      }
+      
+      .apiContainer {
+        font-size: 14px;
+        text-align: left;
+      }
+      .inputs {
+        height: 126px;
+      }
+
+      paper-spinner {
+       width: 63px;
+       height: 63px;
+       top: 31.5px;
+       bottom: 31.5px;
+    }
+
+    #successTag {
+      opacity: 0;
+      margin-top: 0 auto;
+      font-size: 22px;
+      text-align: center;
+      -webkit-transition: opacity 1s ease-in;
+      -moz-transition: opacity 1s ease-in;
+      -o-transition: opacity 1s ease-in;
+      -ms-transition: opacity 1s ease-in;
+      transition: opacity 1s ease-in;
+    }
+
+    .success {
+      color: #55FF33;
+      opacity: 1!important;
+    }
+
+
+
+    </style>
+
+    <div class="wholeThing">
+
+      <div class="instructions">
+
+        <h4>Syncing Balances for {{exchangeName}}</h4>
+
+        <div>This section will use your read-only api key to sync your balances. This application will not store the API key, nor will it use any write functions the exchange API provides. It will only be used for a one-time sync with your balances on this exchange. In order to update your holdings, you will need to resubmit your API Key</div>
+        <div>
+          Please take the following steps to help protect yourself:
+        </div>
+        <ol>
+          <li>Navigate to your exchanges API page, and create a <i>new, read-only</i> API key</li>
+          <li>Enter your API information into the fields below and click submit.</li>
+          <li>Wait for a success message on this app.</li>
+          <li>Disable and delete this API key on your exchanges API page.</li>
+        </ol>
+      </div>
+
+      <div class="apiContainer layout vertical">
+        <div class="inputs">
+          <div style="display: [[d.input]]">
+            <div>Your API Key</div>
+            <paper-input id="apiKey" no-label-float value="{{apiInfo.apiKey}}">
+            </paper-input>
+            <div>Your API Secret</div>
+            <paper-input id="apiSecret" no-label-float value="{{apiInfo.apiSecret}}">
+            </paper-input>
+          </div>
+          <paper-spinner active style="display: [[d.spinner]]; margin: 0 auto;"></paper-spinner>  
+
+        </div>
+
+        <div id="successTag" class$="d.success">
+            Success test
+          </div>
+
+        <paper-button raised on-tap="getBalances" disabled="[[db]]">
+          Submit
+        </paper-button>
+      </div>
+
+    </div>
+     <iron-ajax id="getBalances" method="PUT" handle-as="json" on-response="success" content-type="application/json"></iron-ajax>
+  </template>
+
+  <script>
+    class EnterAPIPanel extends Polymer.Element {
+      static get is() { return 'enter-api-panel'; }
+
+      static get properties() {
+        return {
+          exchangeName: {
+            type: String,
+            notify: true,
+            reflectToAttribute: true,
+            // value: "",
+          },
+          apiInfo: {
+            type: Object,
+            notify: true,
+            reflectToAttribute:true,
+            value: {
+              apiKey: "",
+              apiSecret: "",
+            },
+          },
+          db: {
+            type: Boolean,
+            notify: true,
+            reflectToAttribute: true,
+            value: true,
+          },
+          d: {
+            type: Object,
+            reflectToAttribute: true,
+            value: {
+              input: "block",
+              spinner: "none",
+              success: "none"
+            }
+          }
+        }
+      }
+
+      constructor() {
+        super();
+      }
+
+      static get observers() {
+        return [
+          'exchangeUpdate(exchangeName)',
+          "allInfo(apiInfo.*)"
+        ];
+      }
+      exchangeUpdate(exchangeName){
+        this.set("apiInfo.exchange", this.exchangeName.toLowerCase())
+      }
+
+      allInfo(ai){
+        if(ai.base["apiKey"] && ai.base["apiSecret"] && ai.base["exchange"]) {
+          console.log("all true")
+          this.set('db', "")
+          this.set('db', false)
+          this.notifyPath("db")
+        }
+        else {
+          console.log("some false", ai)
+          this.set('db', true)
+          this.notifyPath("db")
+        }
+      }
+
+      getBalances() {
+
+        this.set("d.spinner", "block")
+        this.set("d.input", "none")
+        this.set('db', true)
+        this.notifyPath("db")
+
+
+        
+
+        this.$.getBalances.url = "/getBalances"
+        this.$.getBalances.body = JSON.stringify(this.apiInfo);
+        this.$.getBalances.generateRequest();
+      }
+
+      success(response) {
+        this.set("d.spinner", "none")
+        this.set("d.input", "block")
+
+        Object.keys(this.apiInfo).map(key =>{
+          this.set(`apiInfo.${key}`, "")
+        })
+
+
+        this.set("d.success", "success")
+
+        console.log(this.apiInfo)
+        console.log("response in success ", response.detail.data)
+      }
+      // setInfo(e) {
+      //   if(e.path[1].id = )
+      // }
+
+      ready(){
+        super.ready();
+      }
+
+    }
+
+    window.customElements.define(EnterAPIPanel.is, EnterAPIPanel);
+  </script>
+</dom-module>

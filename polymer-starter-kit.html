@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="polymer-starter-kit">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `polymer-starter-kit`
+     * game of war (Cards)
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class PolymerStarterKit extends Polymer.Element {
+      static get is() { return 'polymer-starter-kit'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'polymer-starter-kit'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(PolymerStarterKit.is, PolymerStarterKit);
+  </script>
+</dom-module>

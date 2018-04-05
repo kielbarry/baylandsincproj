@@ -1,0 +1,145 @@
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="log-in">
+  <template>
+    <style include="shared-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+
+      .card {
+        width: 35%;
+        margin: 0 auto;
+      }
+      .visibilityIcon {
+        top: 22px;
+        margin-left: auto;
+      }
+      #passwordInput {
+        width: 100%;
+      }
+      #sign-up {
+        color: #4285f4;
+      }
+
+
+    </style>
+
+    <div class="card">
+      <div class="layout vertical">
+        <paper-input label="Email Address" value="{{userInput.email}}" on-keyup="enableButton">
+          <iron-icon icon="mail" slot="prefix"></iron-icon>
+        </paper-input>
+        <div class="layout horizontal"> 
+          <paper-input id="passwordInput" label="Password" type$="{{pwType}}"
+          value="{{userInput.password}}" on-keyup="enableButton">
+            <iron-icon icon="communication:vpn-key" slot="prefix"></iron-icon>
+          </paper-input>
+          <paper-icon-button class="visibilityIcon" icon$="{{displayVisibleIcon}}"
+              on-tap="changePasswordFlexibility"></paper-icon-button>
+        </div>
+        <div class="layout horizontal" style="margin-top:15px">
+          <div style="margin-top:auto; margin-bottom: auto">
+            <a id="sign-up" name="sign-up" href="[[rootPath]]sign-up">Register an account instead
+              <paper-icon-button icon="social:person-add"></paper-icon-button>
+            </a>
+          </div>
+          <paper-button id="logInButton" raised class="link" 
+          disabled="[[conditionalCSS.disabledbutton]]"
+          on-tap="logIn" style="margin-left:auto; margin-right:0;">Log in</paper-button>
+        </div>
+      </div>
+    </div>
+
+   <iron-ajax id="ajaxLogIn" method="POST" handle-as="json" content-type="application/json" on-response="authenticate"></iron-ajax>
+
+
+  </template>
+
+  <script>
+    class LogIn extends Polymer.Element {
+      static get is() { return 'log-in'; }
+
+      static get properties() {
+        return {
+          userInput: {
+            type: Object,
+            reflectToAttribute: true,
+            value: {
+              "email": "",
+              "password": "",
+            }
+          },
+          displayVisibleIcon: {
+            type: String,
+            value: "icons:visibility-off"
+          },
+          pwType: {
+            type: String,
+            value: "password"
+          },
+          conditionalCSS: {
+            type: Object,
+            value: {
+              'matchwarning': 'none',
+              'blankswarning' : 'none',
+              'invalidwarning': 'none',
+              'disabledbutton' : true,
+            },
+          },
+        }
+      }
+
+      constructor() {
+        super();
+      }
+
+      changePasswordFlexibility(e){
+        if(e.path[2].icon === "icons:visibility") {
+          this.set("displayVisibleIcon", "")
+          this.set("displayVisibleIcon", "icons:visibility-off")
+          this.set("pwType", "")
+          this.set("pwType", "password")    
+        }
+        else {
+          this.set("displayVisibleIcon", "")
+          this.set("displayVisibleIcon", "icons:visibility")
+          this.set("pwType", "")
+          this.set("pwType", "text")         
+        }
+      }
+
+      logIn() {
+        if(this.userInput.email && this.userInput.password) {
+          this.$.ajaxSignUp.url = "/login"
+          this.$.ajaxSignUp.body = JSON.stringify(this.userInput);
+          this.$.ajaxSignUp.generateRequest();
+        }
+      }
+      enableButton(){
+        if(this.userInput.email && this.userInput.password) {
+          this.set('conditionalCSS.disabledbutton', "")
+          this.set('conditionalCSS.disabledbutton', false)           
+        }
+        else {
+          this.set('conditionalCSS.disabledbutton', "")
+          this.set('conditionalCSS.disabledbutton', true)
+        }
+      }
+
+      authenticate() {
+        console.log("nothing here yet") 
+      }
+
+
+      ready(){
+        super.ready();
+      }
+
+    }
+
+    window.customElements.define(LogIn.is, LogIn);
+  </script>
+</dom-module>

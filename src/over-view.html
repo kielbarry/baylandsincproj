@@ -1,0 +1,104 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../webcomponents/panels/exchanges-panel.html">
+<link rel="import" href="../webcomponents/panels/enter-api-panel.html">
+
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="over-view">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+      
+      .drawer-content {
+         margin-top:64px;
+        height: 100%;
+        overflow-y: auto;
+      }
+      #enterAPIPanel {
+        --app-drawer-width: 400px;
+      }
+
+    </style>
+
+    <div class="card">
+      <div class="circle">3</div>
+      <h1>Over View</h1>
+      
+      Please add your accounts
+      <paper-icon-button icon="icons:add-circle" on-tap="openExchangesList">
+      </paper-icon-button>
+    </div>
+
+    <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]" align="right">
+      <div class="drawer-content">
+        <exchanges-panel id="exchangesPanel"></exchanges-panel>
+      </div>
+    </app-drawer>
+
+    <app-drawer id="enterAPIPanel" slot="drawer" swipe-open="[[narrow]]" align="right">
+      <div class="drawer-content">
+        <enter-api-panel id="enterAPIPanel" exchange-name="{{exchangeForBalances}}"></enter-api-panel>
+      </div>
+    </app-drawer>
+
+
+
+    <!-- <iron-ajax id="getMinAndMaxCoinPrice" method="GET" handle-as="json" on-response="updateCoinPriceList" content-type="application/json"></iron-ajax> -->
+  </template>
+
+  <script>
+    class OverView extends Polymer.Element {
+      static get is() { return 'over-view'; }
+
+      static get properties() {
+        return {
+          exchangeForBalances: {
+            type: String,
+            notify: true,
+            // reflectToAttribute: true,
+            // value: "",
+          }
+        }
+      }
+
+      constructor() {
+        super();
+      }
+
+      openExchangesList(){
+        this.$.drawer.toggle();
+      }
+
+      // getMinAndMaxCoinPrice(){
+      //   this.$.getMinAndMaxCoinPrice.url = "/getMinAndMaxCoinPrice"
+      //   this.$.getMinAndMaxCoinPrice.generateRequest();
+      // }
+
+      // updateCoinPriceList(resp){
+      //   console.log(resp.detail.response)
+      // }
+
+      ready(){
+        super.ready();
+
+        // this.getMinAndMaxCoinPrice();
+
+        this.$.exchangesPanel.addEventListener("exchangeSelected", (e)=> {
+          // this.set('exchangeForBalances', '');
+          this.set('exchangeForBalances', e.detail.selection);
+          this.$.drawer.toggle();
+          this.$.enterAPIPanel.toggle();
+        })
+      }
+
+    }
+
+    window.customElements.define(OverView.is, OverView);
+  </script>
+</dom-module>

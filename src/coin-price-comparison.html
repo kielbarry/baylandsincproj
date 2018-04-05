@@ -1,0 +1,81 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../webcomponents/panels/exchanges-panel.html">
+<link rel="import" href="../webcomponents/panels/enter-api-panel.html">
+
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="coin-price-comparison">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+/*      app-drawer {
+        position: absolute;
+      }*/
+    </style>
+
+    <div class="card">
+      <div class="circle">3</div>
+      <h1 style="color: blue">COIN PRICE COMPARISON</h1>
+      
+      there shouldnt really be anything here
+
+      
+      <paper-icon-button icon="icons:add-circle" on-tap="openExchangesList">
+      </paper-icon-button>
+    </div>
+
+    <app-drawer id="drawer" align="right">
+      <exchanges-panel id="exchangesPanel"></exchanges-panel>
+      <enter-api-panel id="enterAPIPanel" exchangeForBalances="{{exchangeForBalances}}"></enter-api-panel>
+    </app-drawer>
+
+  </template>
+
+  <script>
+    class CoinPriceComparison extends Polymer.Element {
+      static get is() { return 'coin-price-comparison'; }
+
+      static get properties() {
+        return {
+          allExchangePrices: {
+            type: Object,
+            reflectToAttribute: true,
+            notify: true,
+          },
+
+        }
+      }
+
+      static get observers(){
+        return [
+          "exchangeDataUpdate(all)"
+        ]
+      }
+
+      exchangeDataUpdate(all) {
+        console.log("here in exchangeDataUpdate", all)
+      }
+
+      constructor() {
+        super();
+      }
+
+      ready(){
+        super.ready();
+
+        console.log("answer in ready", this.allExchangePrices)
+        console.log("this.dollar", this.$)
+
+      }
+
+    }
+
+    window.customElements.define(CoinPriceComparison.is, CoinPriceComparison);
+  </script>
+</dom-module>

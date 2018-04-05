@@ -1,0 +1,352 @@
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/game-card/game-card.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+
+
+<!-- <link rel="import" href="bower_components/neon-animation/web-animations.html"> -->
+
+
+<link rel="import" href="my-icons.html">
+
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/iron-icons/editor-icons.html">
+
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+
+<link rel="lazy-import" href="view-404.html">
+<link rel="lazy-import" href="over-view.html">
+<link rel="lazy-import" href="poloniex-view.html">
+<link rel="lazy-import" href="coinbase-view.html">
+<link rel="lazy-import" href="coin-price-comparison.html">
+<link rel="lazy-import" href="log-in.html">
+<link rel="lazy-import" href="sign-up.html">
+<link rel="lazy-import" href="two-factor.html">
+<link rel="lazy-import" href="landing-page.html">
+
+<dom-module id="my-app">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        /*--app-primary-color: #4285f4;*/
+        --app-primary-color: #000000;
+        --app-secondary-color: black;
+
+        display: block;
+      }
+
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+      }
+
+      app-header {
+        color: #fff;
+        background-color: var(--app-primary-color);
+      }
+
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: #faf4db;
+      }
+
+      app-toolbar {
+        text-align: center;
+      }
+
+      @font-face {
+          font-family: 'CursiveFont';
+          src: "./adine-kirnberg.regular.ttf"
+      }
+
+
+      #main-title {
+        font-family: "CursiveFont";
+      }
+
+      .user-sign-in > a {
+        color: #faf4db;
+        font-size: 14px;
+        fill: #fff;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+        line-height: 40px;
+      }
+
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }
+
+      paper-tabs {
+        align-items: center;
+      }
+
+
+
+      .tab-navigation {
+        -webkit-font-smoothing: antialiased;
+        background-color: black;
+        color: #faf4db;
+        height: 22px;
+        font-size: 10px;
+        font-weight: normal;
+        --paper-tabs-selection-bar-color: #faf4db; 
+      }
+
+      .mainTabs {
+        color: #faf4db;
+      }
+
+
+    </style>
+
+    <app-location route="{{route}}" url-space-regex="^[[rootPath]]"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="[[rootPath]]:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    <app-drawer-layout fullbleed narrow="{{narrow}}">
+      <!-- Drawer content -->
+      <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
+        <app-toolbar>Menu</app-toolbar>
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+          <a name="over-view" href="[[rootPath]]over-view">Overview</a>
+          <iron-list items="[[pageList]]" as="page">
+            <template>
+              <a name="[[page.name]]" href="[[rootPath]][[page.path]]"> {{ page.title }}</a>
+            </template>
+          </iron-list>'
+        </iron-selector>
+      </app-drawer>
+
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region fullbleed>
+        <app-header slot="header" condenses reveals effects="waterfall">
+          <app-toolbar>
+            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+            <div id="main-title" main-title>Prosophia</div>
+
+            <div class="user-sign-in layout horizontal">
+              <a name="log-in" href="[[rootPath]]log-in">Log In 
+                <paper-icon-button icon="icons:perm-identity"></paper-icon-button>
+              </a>
+              <div> | </div>
+              <a name="sign-up" style="padding-left: 16px" href="[[rootPath]]sign-up"> Register 
+                <paper-icon-button icon="social:person-add"></paper-icon-button>
+              </a>
+            </div>
+          </app-toolbar>
+        </app-header>
+
+
+        <paper-tabs class="tab-navigation" selected="0" scrollable>
+          <paper-tab style="margin-right:50px">
+            <a class="mainTabs" name="dashboard" href="[[rootPath]][[parentView]]">
+              Dashboard
+              <iron-icon icon="editor:multiline-chart"></iron-icon>
+            </a>
+          </paper-tab>
+          <paper-tab>
+            <a class="mainTabs" name="coin-price-comparison" href="[[rootPath]]coin-price-comparison">
+              Coin Price Comparison
+              <iron-icon icon="icons:list"></iron-icon>
+            </a>
+          </paper-tab>
+        </paper-tabs>
+
+
+        <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view-404" role="main">
+          <over-view name="over-view"></over-view>
+          <poloniex-view name="poloniex-view"></poloniex-view>
+          <coinbase-view name="coinbase-view"></coinbase-view>
+          <log-in name="log-in"></log-in>
+          <sign-up name="sign-up"></sign-up>
+          <coin-price-comparison 
+          name="coin-price-comparison" all-exchange-prices="{{allExchangePrices}}">
+          </coin-price-comparison>
+          <view-404 name="view-404"></view-404>
+        </iron-pages>
+
+      </app-header-layout>
+
+
+      
+      
+
+
+    </app-drawer-layout>
+
+
+    <iron-ajax id="getMinAndMaxCoinPrice" method="GET" handle-as="json" on-response="updateCoinPriceList" content-type="application/json"></iron-ajax>
+
+
+  </template>
+
+  <script>
+    class MyApp extends Polymer.Element {
+      static get is() { return 'my-app'; }
+
+      static get properties() {
+        return {
+          page: {
+            type: String,
+            reflectToAttribute: true,
+            observer: '_pageChanged',
+          },
+          parentView: {
+            type: String,
+            reflectToAttribute: true,
+            notify: true,
+            value: "",
+          },
+          fakePage: {
+            type: String,
+            value: "over-view"
+          },
+          routeData: Object,
+          subroute: String,
+          // This shouldn't be neccessary, but the Analyzer isn't picking up
+          // Polymer.Element#rootPath
+          rootPath: String,
+          pageList: {
+            type: Array,
+            reflectToAttribute: true,
+            value: [
+              {
+                name: "coinbase-view",
+                path: "coinbase-view",
+                title: "Coinbase View"
+              },
+              {
+                name: "poloniex-view",
+                path: "poloniex-view",
+                title: "Poloniex View"
+              },
+            ]
+          },
+          allExchangePrices : {
+            type: Object,
+            reflectToAttribute: true,
+            notify: true,
+            // value: {},
+          },
+
+        };
+      }
+
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.page)',
+        ];
+      }
+
+      constructor() {
+        super();
+      }
+
+      getMinAndMaxCoinPrice(){
+        this.$.getMinAndMaxCoinPrice.url = "/getMinAndMaxCoinPrice"
+        this.$.getMinAndMaxCoinPrice.generateRequest();
+      }
+
+      updateCoinPriceList(resp){
+        console.log(resp.detail.response)
+        this.set("allExchangePrices", resp.detail.response)
+        console.log("this.in myapp", this.allExchangePrices)
+      }
+
+
+      _routePageChanged(page) {
+
+        console.log("here is app-route",page)
+
+        this.page = page || 'over-view';
+        // Close a non-persistent drawer when the page & route are changed.
+        if (!this.$.drawer.persistent) {
+          this.$.drawer.close();
+        }
+      }
+
+      _pageChanged(page) {
+
+        console.log("page", page)
+
+
+        var resolvedPageUrl;
+
+        if(page.includes("-view")) { 
+          // this.set("parentView", page.split("-")[0])
+          this.set("parentView", page)
+        }
+
+        console.log("parentView", this.parentView)
+
+        // if(this.parentView !== "" && page !== "coin-price-comparison") {
+        //   resolvedPageUrl = this.resolveUrl(this.parentView + '.html');
+        // }
+        // else {
+          resolvedPageUrl = this.resolveUrl(page + '.html');
+        // }
+
+        // var resolvedPageUrl = this.resolveUrl(page + '.html');
+
+        console.log("resolvedPageUrl", resolvedPageUrl)
+
+        Polymer.importHref(
+            resolvedPageUrl,
+            null,
+            this._showPage404.bind(this),
+            true
+        );
+      }
+
+      _showPage404() {
+        this.page = 'view-404';
+      }
+
+
+      
+      ready(){
+        super.ready();
+
+        this.getMinAndMaxCoinPrice();
+      }
+
+
+    }
+
+    window.customElements.define(MyApp.is, MyApp);
+  </script>
+</dom-module>

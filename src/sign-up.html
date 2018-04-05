@@ -1,0 +1,1337 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/google-recaptcha/google-recaptcha.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="sign-up">
+  <template>
+    <style include="shared-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+
+      .card {
+        width: 35%;
+        margin: 0 auto;
+      }
+
+      .wrapper-btns {
+        margin-top: 15px;
+      }
+      paper-button {
+          background-color: #4285f4;
+          color: white;
+      }
+      #signUpButton {
+        opacity: var(--button-opacity);
+      }
+
+      #passwordMatchWarning,
+      #blanksPresent,
+      #invalidWarning {
+        padding-left: 15px;
+        color: red;
+      }
+      #intPrefix {
+        width: 10%;
+      }
+
+      .visibilityIcon {
+        top: 22px;
+      }
+      .secondInput {
+        padding-left: 16px;
+      }
+      #log-in {
+        color: #4285f4;
+      }
+
+    </style>
+
+    <div class="card">
+      <div id="unauthenticated">
+          <h1>Create an account</h1>
+
+
+          <div style="font-size: 12px">Password must be alphanumeric, with both uppercase and lowercase letters, and a special character.</div>
+
+          <div class="layout vertical">
+
+            <div class="layout horizontal">
+              <paper-input label="First Name *" auto-validate pattern="[a-zA-Z]*" error-message="This field only accepts letters."
+              value="{{formData.firstname}}"></paper-input>
+              <paper-input class="secondInput" label="Last Name *" auto-validate pattern="[a-zA-Z]*" error-message="This field only accepts letters."
+              value="{{formData.lastname}}"></paper-input>
+            </div>
+
+            <div class="layout horizontal">
+              <paper-input label="Phone Number *"  auto-validate pattern="[^[0-9]+$"  error-message="This field only accepts numbers" prefix="+1" value="{{formData.phoneNumber}}">
+              </paper-input>
+              <paper-input class="secondInput" value="{{ formData.email }}" label="Email *" on-keyup="newEmail"></paper-input>
+              <iron-icon icon="icons:check-circle"></iron-icon>
+              <iron-icon icon="icons:cancel"></iron-icon>
+            </div>
+
+            <div class="passwordRow layout horizontal">
+              <paper-input id="passwordInput" 
+              label="Password *"
+              auto-validate pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}"
+              error-message="Invalid password"
+              type$="{{pwType}}"
+              value="{{formData.password}}"></paper-input>
+              <paper-input id="confirmPasswordInput" class="secondInput" label="Confirm Password *" type$="{{pwType}}" value="{{formData.confirmPassword}}" on-keyup="validatePassword">
+              </paper-input>
+              
+              <paper-icon-button class="visibilityIcon" icon$="{{displayVisibleIcon}}"
+              on-tap="changePasswordFlexibility"></paper-icon-button>
+            </div>
+
+            <!-- <div id="captchaDiv" style="overflow: auto;"> -->
+              
+              <!-- scroll-target="captchaDiv" -->
+              <google-recaptcha
+              style="width: 100%; margin-left: 0 auto; margin-right: 0 auto; top: 15px;"
+              force-in-body
+              
+              value="{{ formData.g-recaptcha-response}}"
+              sitekey="6LeGhz8UAAAAACUWRQ1J2aSPOVZ4ixXU5O_MvpHH"
+              ></google-recaptcha>
+            <!-- </div> -->
+
+            <div class="layout horizontal" style="margin-top:15px">
+              <div style="margin-top:auto; margin-bottom: auto">
+                <a id="log-in" name="log-in" href="[[rootPath]]log-in">Log in instead
+                  <paper-icon-button icon="social:person-add"></paper-icon-button>
+                </a>
+              </div>
+
+              <paper-button id="signUpButton" raised class="link" 
+              disabled="[[conditionalCSS.disabledbutton]]"
+              on-tap="signUp" style="margin-left:auto; margin-right:0;">Sign Up</paper-button>
+            </div>
+
+          </div>
+
+<!--           
+          <label>First Name *</label>
+          <paper-input is="iron-input" id="firstname" type="text" no-label-float value="{{formData.firstname}}" on-focusout="allFieldsInput"></paper-input>
+
+          <label>Last Name *</label>
+          <paper-input is="iron-input" id="lastname" type="text" no-label-float value="{{formData.lastname}}" on-focusout="allFieldsInput"></paper-input>
+
+          <label>Email *</label>
+          <paper-input is="iron-input" id="email" type="email" no-label-float value="{{formData.email}}" on-focusout="allFieldsInput"></paper-input>
+
+
+
+          <div class="layout horizontal">
+              <label>Password *</label>
+              <div id="invalidWarning" style="display: {{ conditionalCSS.invalidwarning }}">
+                Passwords must contain a number, uppercase and lowercase letter, a special char, and  be at least 8 chars long.
+              </div>
+          </div>
+          <paper-input is="iron-input" id="password" type="password" no-label-float value="{{formData.password}}" on-focusout="allFieldsInput" on-keyup="validatePassword"></paper-input>
+
+
+
+          <div class="layout horizontal">
+              <label>Repeat Password *</label>
+              <div id="passwordMatchWarning" style="display: {{ conditionalCSS.matchwarning }}">
+                Please ensure your passwords match
+              </div>
+          </div>
+          <paper-input is="iron-input" id="repeatpassword" type="password" no-label-float value="{{formData.repeatpassword}}" on-keyup="doPasswordsMatch" on-focusout="allFieldsInput"></paper-input>
+          <div id="blanksPresent" style="display: {{ conditionalCSS.blankswarning }}">Please fill in all fields to continue</div>
+
+
+          <label>Phone Number *</label>
+          <paper-input is="iron-input" id="phoneNumber" type="phone" no-label-float value="{{formData.phoneNumber}}" on-focusout="allFieldsInput"></paper-input>
+
+          <div class="wrapper-btns">
+              <paper-button id="sendSMSButton" raised class="link"
+              on-tap="sendSMSCode">Send SMS Verification</paper-button>
+          </div>
+
+
+          <google-recaptcha style="margin-top: 15px"
+            force-in-body
+            value="{{ formData.g-recaptcha-response}}"
+            sitekey="6LeGhz8UAAAAACUWRQ1J2aSPOVZ4ixXU5O_MvpHH"
+          ></google-recaptcha>
+
+          <div class="wrapper-btns">
+              <paper-button id="signUpButton" raised class="link" disabled="[[conditionalCSS.disabledbutton]]"
+              on-tap="signUp">Sign Up</paper-button>
+              <label> Already a user? </label>
+              <paper-button raised class="primary">Log In</paper-button>
+          </div>
+ -->
+      </div>    
+  </div>
+  
+  <iron-ajax id="ajaxNewEmail" method="PUT" handle-as="json" content-type="application/json" on-response="availableEmail"></iron-ajax>
+
+
+  <iron-ajax id="ajaxSignUp" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
+  <iron-ajax id="ajaxRecaptcha" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
+  <iron-ajax id="ajaxSMS" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
+
+  </template>
+
+  <script src='https://www.google.com/recaptcha/api.js'>
+
+  </script>
+
+  <script>
+    class SignUp extends Polymer.Element {
+      
+      static get is() { 
+        return 'sign-up'; 
+      }
+
+      static get properties() {
+        return {
+          displayVisibleIcon: {
+            type: String,
+            value: "icons:visibility-off"
+          },
+          pwType: {
+            type: String,
+            value: "password"
+          },
+          formData: {
+            type: Object,
+            value : {
+              'firstname': '',
+              'lastname': '',
+              'email': '',
+              'password': '',
+              // 'repeatpassword': '',
+              'confirmPassword': '',
+              'phoneNumber': '',
+              'g-recaptcha-response': '',
+            },
+          },
+          conditionalCSS: {
+            type: Object,
+            value: {
+              'matchwarning': 'none',
+              'blankswarning' : 'none',
+              'invalidwarning': 'none',
+              'disabledbutton' : true,
+            },
+          },
+          validForm: {
+            type: Object,
+            value: {
+              'passwordvalid': false,
+              'passwordsmatch': false,
+              'allfields' : false,
+            },
+            reflectToAttribute: true,
+            notify: true,
+          },
+          countryCodeList: {
+            type: Array,
+            value: [
+                {
+                  "code": "+7 840",
+                  "name": "Abkhazia"
+                },
+                {
+                  "code": "+93",
+                  "name": "Afghanistan"
+                },
+                {
+                  "code": "+355",
+                  "name": "Albania"
+                },
+                {
+                  "code": "+213",
+                  "name": "Algeria"
+                },
+                {
+                  "code": "+1 684",
+                  "name": "American Samoa"
+                },
+                {
+                  "code": "+376",
+                  "name": "Andorra"
+                },
+                {
+                  "code": "+244",
+                  "name": "Angola"
+                },
+                {
+                  "code": "+1 264",
+                  "name": "Anguilla"
+                },
+                {
+                  "code": "+1 268",
+                  "name": "Antigua and Barbuda"
+                },
+                {
+                  "code": "+54",
+                  "name": "Argentina"
+                },
+                {
+                  "code": "+374",
+                  "name": "Armenia"
+                },
+                {
+                  "code": "+297",
+                  "name": "Aruba"
+                },
+                {
+                  "code": "+247",
+                  "name": "Ascension"
+                },
+                {
+                  "code": "+61",
+                  "name": "Australia"
+                },
+                {
+                  "code": "+672",
+                  "name": "Australian External Territories"
+                },
+                {
+                  "code": "+43",
+                  "name": "Austria"
+                },
+                {
+                  "code": "+994",
+                  "name": "Azerbaijan"
+                },
+                {
+                  "code": "+1 242",
+                  "name": "Bahamas"
+                },
+                {
+                  "code": "+973",
+                  "name": "Bahrain"
+                },
+                {
+                  "code": "+880",
+                  "name": "Bangladesh"
+                },
+                {
+                  "code": "+1 246",
+                  "name": "Barbados"
+                },
+                {
+                  "code": "+1 268",
+                  "name": "Barbuda"
+                },
+                {
+                  "code": "+375",
+                  "name": "Belarus"
+                },
+                {
+                  "code": "+32",
+                  "name": "Belgium"
+                },
+                {
+                  "code": "+501",
+                  "name": "Belize"
+                },
+                {
+                  "code": "+229",
+                  "name": "Benin"
+                },
+                {
+                  "code": "+1 441",
+                  "name": "Bermuda"
+                },
+                {
+                  "code": "+975",
+                  "name": "Bhutan"
+                },
+                {
+                  "code": "+591",
+                  "name": "Bolivia"
+                },
+                {
+                  "code": "+387",
+                  "name": "Bosnia and Herzegovina"
+                },
+                {
+                  "code": "+267",
+                  "name": "Botswana"
+                },
+                {
+                  "code": "+55",
+                  "name": "Brazil"
+                },
+                {
+                  "code": "+246",
+                  "name": "British Indian Ocean Territory"
+                },
+                {
+                  "code": "+1 284",
+                  "name": "British Virgin Islands"
+                },
+                {
+                  "code": "+673",
+                  "name": "Brunei"
+                },
+                {
+                  "code": "+359",
+                  "name": "Bulgaria"
+                },
+                {
+                  "code": "+226",
+                  "name": "Burkina Faso"
+                },
+                {
+                  "code": "+257",
+                  "name": "Burundi"
+                },
+                {
+                  "code": "+855",
+                  "name": "Cambodia"
+                },
+                {
+                  "code": "+237",
+                  "name": "Cameroon"
+                },
+                {
+                  "code": "+1",
+                  "name": "Canada"
+                },
+                {
+                  "code": "+238",
+                  "name": "Cape Verde"
+                },
+                {
+                  "code": "+ 345",
+                  "name": "Cayman Islands"
+                },
+                {
+                  "code": "+236",
+                  "name": "Central African Republic"
+                },
+                {
+                  "code": "+235",
+                  "name": "Chad"
+                },
+                {
+                  "code": "+56",
+                  "name": "Chile"
+                },
+                {
+                  "code": "+86",
+                  "name": "China"
+                },
+                {
+                  "code": "+61",
+                  "name": "Christmas Island"
+                },
+                {
+                  "code": "+61",
+                  "name": "Cocos-Keeling Islands"
+                },
+                {
+                  "code": "+57",
+                  "name": "Colombia"
+                },
+                {
+                  "code": "+269",
+                  "name": "Comoros"
+                },
+                {
+                  "code": "+242",
+                  "name": "Congo"
+                },
+                {
+                  "code": "+243",
+                  "name": "Congo, Dem. Rep. of (Zaire)"
+                },
+                {
+                  "code": "+682",
+                  "name": "Cook Islands"
+                },
+                {
+                  "code": "+506",
+                  "name": "Costa Rica"
+                },
+                {
+                  "code": "+385",
+                  "name": "Croatia"
+                },
+                {
+                  "code": "+53",
+                  "name": "Cuba"
+                },
+                {
+                  "code": "+599",
+                  "name": "Curacao"
+                },
+                {
+                  "code": "+537",
+                  "name": "Cyprus"
+                },
+                {
+                  "code": "+420",
+                  "name": "Czech Republic"
+                },
+                {
+                  "code": "+45",
+                  "name": "Denmark"
+                },
+                {
+                  "code": "+246",
+                  "name": "Diego Garcia"
+                },
+                {
+                  "code": "+253",
+                  "name": "Djibouti"
+                },
+                {
+                  "code": "+1 767",
+                  "name": "Dominica"
+                },
+                {
+                  "code": "+1 809",
+                  "name": "Dominican Republic"
+                },
+                {
+                  "code": "+670",
+                  "name": "East Timor"
+                },
+                {
+                  "code": "+56",
+                  "name": "Easter Island"
+                },
+                {
+                  "code": "+593",
+                  "name": "Ecuador"
+                },
+                {
+                  "code": "+20",
+                  "name": "Egypt"
+                },
+                {
+                  "code": "+503",
+                  "name": "El Salvador"
+                },
+                {
+                  "code": "+240",
+                  "name": "Equatorial Guinea"
+                },
+                {
+                  "code": "+291",
+                  "name": "Eritrea"
+                },
+                {
+                  "code": "+372",
+                  "name": "Estonia"
+                },
+                {
+                  "code": "+251",
+                  "name": "Ethiopia"
+                },
+                {
+                  "code": "+500",
+                  "name": "Falkland Islands"
+                },
+                {
+                  "code": "+298",
+                  "name": "Faroe Islands"
+                },
+                {
+                  "code": "+679",
+                  "name": "Fiji"
+                },
+                {
+                  "code": "+358",
+                  "name": "Finland"
+                },
+                {
+                  "code": "+33",
+                  "name": "France"
+                },
+                {
+                  "code": "+596",
+                  "name": "French Antilles"
+                },
+                {
+                  "code": "+594",
+                  "name": "French Guiana"
+                },
+                {
+                  "code": "+689",
+                  "name": "French Polynesia"
+                },
+                {
+                  "code": "+241",
+                  "name": "Gabon"
+                },
+                {
+                  "code": "+220",
+                  "name": "Gambia"
+                },
+                {
+                  "code": "+995",
+                  "name": "Georgia"
+                },
+                {
+                  "code": "+49",
+                  "name": "Germany"
+                },
+                {
+                  "code": "+233",
+                  "name": "Ghana"
+                },
+                {
+                  "code": "+350",
+                  "name": "Gibraltar"
+                },
+                {
+                  "code": "+30",
+                  "name": "Greece"
+                },
+                {
+                  "code": "+299",
+                  "name": "Greenland"
+                },
+                {
+                  "code": "+1 473",
+                  "name": "Grenada"
+                },
+                {
+                  "code": "+590",
+                  "name": "Guadeloupe"
+                },
+                {
+                  "code": "+1 671",
+                  "name": "Guam"
+                },
+                {
+                  "code": "+502",
+                  "name": "Guatemala"
+                },
+                {
+                  "code": "+224",
+                  "name": "Guinea"
+                },
+                {
+                  "code": "+245",
+                  "name": "Guinea-Bissau"
+                },
+                {
+                  "code": "+595",
+                  "name": "Guyana"
+                },
+                {
+                  "code": "+509",
+                  "name": "Haiti"
+                },
+                {
+                  "code": "+504",
+                  "name": "Honduras"
+                },
+                {
+                  "code": "+852",
+                  "name": "Hong Kong SAR China"
+                },
+                {
+                  "code": "+36",
+                  "name": "Hungary"
+                },
+                {
+                  "code": "+354",
+                  "name": "Iceland"
+                },
+                {
+                  "code": "+91",
+                  "name": "India"
+                },
+                {
+                  "code": "+62",
+                  "name": "Indonesia"
+                },
+                {
+                  "code": "+98",
+                  "name": "Iran"
+                },
+                {
+                  "code": "+964",
+                  "name": "Iraq"
+                },
+                {
+                  "code": "+353",
+                  "name": "Ireland"
+                },
+                {
+                  "code": "+972",
+                  "name": "Israel"
+                },
+                {
+                  "code": "+39",
+                  "name": "Italy"
+                },
+                {
+                  "code": "+225",
+                  "name": "Ivory Coast"
+                },
+                {
+                  "code": "+1 876",
+                  "name": "Jamaica"
+                },
+                {
+                  "code": "+81",
+                  "name": "Japan"
+                },
+                {
+                  "code": "+962",
+                  "name": "Jordan"
+                },
+                {
+                  "code": "+7 7",
+                  "name": "Kazakhstan"
+                },
+                {
+                  "code": "+254",
+                  "name": "Kenya"
+                },
+                {
+                  "code": "+686",
+                  "name": "Kiribati"
+                },
+                {
+                  "code": "+965",
+                  "name": "Kuwait"
+                },
+                {
+                  "code": "+996",
+                  "name": "Kyrgyzstan"
+                },
+                {
+                  "code": "+856",
+                  "name": "Laos"
+                },
+                {
+                  "code": "+371",
+                  "name": "Latvia"
+                },
+                {
+                  "code": "+961",
+                  "name": "Lebanon"
+                },
+                {
+                  "code": "+266",
+                  "name": "Lesotho"
+                },
+                {
+                  "code": "+231",
+                  "name": "Liberia"
+                },
+                {
+                  "code": "+218",
+                  "name": "Libya"
+                },
+                {
+                  "code": "+423",
+                  "name": "Liechtenstein"
+                },
+                {
+                  "code": "+370",
+                  "name": "Lithuania"
+                },
+                {
+                  "code": "+352",
+                  "name": "Luxembourg"
+                },
+                {
+                  "code": "+853",
+                  "name": "Macau SAR China"
+                },
+                {
+                  "code": "+389",
+                  "name": "Macedonia"
+                },
+                {
+                  "code": "+261",
+                  "name": "Madagascar"
+                },
+                {
+                  "code": "+265",
+                  "name": "Malawi"
+                },
+                {
+                  "code": "+60",
+                  "name": "Malaysia"
+                },
+                {
+                  "code": "+960",
+                  "name": "Maldives"
+                },
+                {
+                  "code": "+223",
+                  "name": "Mali"
+                },
+                {
+                  "code": "+356",
+                  "name": "Malta"
+                },
+                {
+                  "code": "+692",
+                  "name": "Marshall Islands"
+                },
+                {
+                  "code": "+596",
+                  "name": "Martinique"
+                },
+                {
+                  "code": "+222",
+                  "name": "Mauritania"
+                },
+                {
+                  "code": "+230",
+                  "name": "Mauritius"
+                },
+                {
+                  "code": "+262",
+                  "name": "Mayotte"
+                },
+                {
+                  "code": "+52",
+                  "name": "Mexico"
+                },
+                {
+                  "code": "+691",
+                  "name": "Micronesia"
+                },
+                {
+                  "code": "+1 808",
+                  "name": "Midway Island"
+                },
+                {
+                  "code": "+373",
+                  "name": "Moldova"
+                },
+                {
+                  "code": "+377",
+                  "name": "Monaco"
+                },
+                {
+                  "code": "+976",
+                  "name": "Mongolia"
+                },
+                {
+                  "code": "+382",
+                  "name": "Montenegro"
+                },
+                {
+                  "code": "+1664",
+                  "name": "Montserrat"
+                },
+                {
+                  "code": "+212",
+                  "name": "Morocco"
+                },
+                {
+                  "code": "+95",
+                  "name": "Myanmar"
+                },
+                {
+                  "code": "+264",
+                  "name": "Namibia"
+                },
+                {
+                  "code": "+674",
+                  "name": "Nauru"
+                },
+                {
+                  "code": "+977",
+                  "name": "Nepal"
+                },
+                {
+                  "code": "+31",
+                  "name": "Netherlands"
+                },
+                {
+                  "code": "+599",
+                  "name": "Netherlands Antilles"
+                },
+                {
+                  "code": "+1 869",
+                  "name": "Nevis"
+                },
+                {
+                  "code": "+687",
+                  "name": "New Caledonia"
+                },
+                {
+                  "code": "+64",
+                  "name": "New Zealand"
+                },
+                {
+                  "code": "+505",
+                  "name": "Nicaragua"
+                },
+                {
+                  "code": "+227",
+                  "name": "Niger"
+                },
+                {
+                  "code": "+234",
+                  "name": "Nigeria"
+                },
+                {
+                  "code": "+683",
+                  "name": "Niue"
+                },
+                {
+                  "code": "+672",
+                  "name": "Norfolk Island"
+                },
+                {
+                  "code": "+850",
+                  "name": "North Korea"
+                },
+                {
+                  "code": "+1 670",
+                  "name": "Northern Mariana Islands"
+                },
+                {
+                  "code": "+47",
+                  "name": "Norway"
+                },
+                {
+                  "code": "+968",
+                  "name": "Oman"
+                },
+                {
+                  "code": "+92",
+                  "name": "Pakistan"
+                },
+                {
+                  "code": "+680",
+                  "name": "Palau"
+                },
+                {
+                  "code": "+970",
+                  "name": "Palestinian Territory"
+                },
+                {
+                  "code": "+507",
+                  "name": "Panama"
+                },
+                {
+                  "code": "+675",
+                  "name": "Papua New Guinea"
+                },
+                {
+                  "code": "+595",
+                  "name": "Paraguay"
+                },
+                {
+                  "code": "+51",
+                  "name": "Peru"
+                },
+                {
+                  "code": "+63",
+                  "name": "Philippines"
+                },
+                {
+                  "code": "+48",
+                  "name": "Poland"
+                },
+                {
+                  "code": "+351",
+                  "name": "Portugal"
+                },
+                {
+                  "code": "+1 787",
+                  "name": "Puerto Rico"
+                },
+                {
+                  "code": "+974",
+                  "name": "Qatar"
+                },
+                {
+                  "code": "+262",
+                  "name": "Reunion"
+                },
+                {
+                  "code": "+40",
+                  "name": "Romania"
+                },
+                {
+                  "code": "+7",
+                  "name": "Russia"
+                },
+                {
+                  "code": "+250",
+                  "name": "Rwanda"
+                },
+                {
+                  "code": "+685",
+                  "name": "Samoa"
+                },
+                {
+                  "code": "+378",
+                  "name": "San Marino"
+                },
+                {
+                  "code": "+966",
+                  "name": "Saudi Arabia"
+                },
+                {
+                  "code": "+221",
+                  "name": "Senegal"
+                },
+                {
+                  "code": "+381",
+                  "name": "Serbia"
+                },
+                {
+                  "code": "+248",
+                  "name": "Seychelles"
+                },
+                {
+                  "code": "+232",
+                  "name": "Sierra Leone"
+                },
+                {
+                  "code": "+65",
+                  "name": "Singapore"
+                },
+                {
+                  "code": "+421",
+                  "name": "Slovakia"
+                },
+                {
+                  "code": "+386",
+                  "name": "Slovenia"
+                },
+                {
+                  "code": "+677",
+                  "name": "Solomon Islands"
+                },
+                {
+                  "code": "+27",
+                  "name": "South Africa"
+                },
+                {
+                  "code": "+500",
+                  "name": "South Georgia and the South Sandwich Islands"
+                },
+                {
+                  "code": "+82",
+                  "name": "South Korea"
+                },
+                {
+                  "code": "+34",
+                  "name": "Spain"
+                },
+                {
+                  "code": "+94",
+                  "name": "Sri Lanka"
+                },
+                {
+                  "code": "+249",
+                  "name": "Sudan"
+                },
+                {
+                  "code": "+597",
+                  "name": "Suriname"
+                },
+                {
+                  "code": "+268",
+                  "name": "Swaziland"
+                },
+                {
+                  "code": "+46",
+                  "name": "Sweden"
+                },
+                {
+                  "code": "+41",
+                  "name": "Switzerland"
+                },
+                {
+                  "code": "+963",
+                  "name": "Syria"
+                },
+                {
+                  "code": "+886",
+                  "name": "Taiwan"
+                },
+                {
+                  "code": "+992",
+                  "name": "Tajikistan"
+                },
+                {
+                  "code": "+255",
+                  "name": "Tanzania"
+                },
+                {
+                  "code": "+66",
+                  "name": "Thailand"
+                },
+                {
+                  "code": "+670",
+                  "name": "Timor Leste"
+                },
+                {
+                  "code": "+228",
+                  "name": "Togo"
+                },
+                {
+                  "code": "+690",
+                  "name": "Tokelau"
+                },
+                {
+                  "code": "+676",
+                  "name": "Tonga"
+                },
+                {
+                  "code": "+1 868",
+                  "name": "Trinidad and Tobago"
+                },
+                {
+                  "code": "+216",
+                  "name": "Tunisia"
+                },
+                {
+                  "code": "+90",
+                  "name": "Turkey"
+                },
+                {
+                  "code": "+993",
+                  "name": "Turkmenistan"
+                },
+                {
+                  "code": "+1 649",
+                  "name": "Turks and Caicos Islands"
+                },
+                {
+                  "code": "+688",
+                  "name": "Tuvalu"
+                },
+                {
+                  "code": "+1 340",
+                  "name": "U.S. Virgin Islands"
+                },
+                {
+                  "code": "+256",
+                  "name": "Uganda"
+                },
+                {
+                  "code": "+380",
+                  "name": "Ukraine"
+                },
+                {
+                  "code": "+971",
+                  "name": "United Arab Emirates"
+                },
+                {
+                  "code": "+44",
+                  "name": "United Kingdom"
+                },
+                {
+                  "code": "+1",
+                  "name": "United States"
+                },
+                {
+                  "code": "+598",
+                  "name": "Uruguay"
+                },
+                {
+                  "code": "+998",
+                  "name": "Uzbekistan"
+                },
+                {
+                  "code": "+678",
+                  "name": "Vanuatu"
+                },
+                {
+                  "code": "+58",
+                  "name": "Venezuela"
+                },
+                {
+                  "code": "+84",
+                  "name": "Vietnam"
+                },
+                {
+                  "code": "+1 808",
+                  "name": "Wake Island"
+                },
+                {
+                  "code": "+681",
+                  "name": "Wallis and Futuna"
+                },
+                {
+                  "code": "+967",
+                  "name": "Yemen"
+                },
+                {
+                  "code": "+260",
+                  "name": "Zambia"
+                },
+                {
+                  "code": "+255",
+                  "name": "Zanzibar"
+                },
+                {
+                  "code": "+263",
+                  "name": "Zimbabwe"
+                }
+              ]
+          }
+        }
+      }
+
+      static get observers(){
+        return [
+        'validateForm(validForm.*)'
+        ]
+      }
+
+      constructor(){
+        super()
+      }
+
+
+      newEmail() {
+        var e = this.formData.email;
+        if(e.inclues("@") && e.includes(".com")) {
+          this.$.ajaxNewEmail.url = "/newEmail"
+          this.$.ajaxNewEmail.body = JSON.stringify({"email":e});
+          this.$.ajaxNewEmail.generateRequest();
+        }
+      }
+
+      availableEmail(resp) {
+        console.log("here in availableEmail", resp.detail.response)
+      }
+
+      changePasswordFlexibility(e){
+
+        if(e.path[2].icon === "icons:visibility") {
+          this.set("displayVisibleIcon", "")
+          this.set("displayVisibleIcon", "icons:visibility-off")
+          this.set("pwType", "")
+          this.set("pwType", "password")    
+        }
+        else {
+          this.set("displayVisibleIcon", "")
+          this.set("displayVisibleIcon", "icons:visibility")
+          this.set("pwType", "")
+          this.set("pwType", "text")         
+        }
+
+      }
+
+
+      allFieldsInput(){
+
+        var blanks = false;
+        Object.keys(this.formData).map(key => {
+          if(this.formData[key] === ''){
+            blanks = true
+            return
+          }
+        })
+
+        blanks ? 
+          this.set('conditionalCSS.blankswarning', 'block') : 
+          this.set('conditionalCSS.blankswarning', 'none')
+
+        blanks ? 
+           this.set('validForm.allfields', false) : 
+           this.set('validForm.allfields', true)
+      }
+
+      doPasswordsMatch() {
+        var pw = this.formData.password
+        var rpw = this.formData.repeatpassword
+        pw !== rpw ? 
+          this.set('conditionalCSS.matchwarning', 'block') :
+          this.set('conditionalCSS.matchwarning', 'none')
+
+        pw !== rpw ? 
+          this.set('validForm.passwordsmatch', false) :
+          this.set('validForm.passwordsmatch', true)
+
+      }
+
+      validatePassword() {
+        if(this.formData.password === this.formData.confirmPassword) {
+          this.set('validForm.passwordsmatch', true);
+        }
+        else {
+          this.set('validForm.passwordsmatch', false);
+        }
+      }
+
+      // validatePassword(){
+      //   var valid = this.formData.password.match(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}/)
+      //   valid === null ? 
+      //     this.set('conditionalCSS.invalidwarning', 'block') : 
+      //     this.set('conditionalCSS.invalidwarning', 'none')
+
+      //   valid === null ? 
+      //     this.set('validForm.passwordvalid', false) : 
+      //     this.set('validForm.passwordvalid', true)
+
+      // }
+
+      validateForm(validForm){
+
+        var valid = true
+        Object.keys(this.validForm).some(key => {
+          if(this.validForm[key] === false) {
+            this.set('conditionalCSS.disabledbutton', true)
+            this.updateStyles({
+              '--button-opacity': 0.5,
+            })
+            valid = false
+          }
+        })
+
+        if(valid){
+          this.set('conditionalCSS.disabledbutton', false) 
+          this.updateStyles({
+            '--button-opacity': 1,
+          })
+        }
+      }
+
+      signUp(){
+        this.$.ajaxSignUp.url = "/signup"
+        this.$.ajaxSignUp.body = JSON.stringify(this.formData);
+        this.$.ajaxSignUp.generateRequest();
+      }
+
+      verifyRecaptcha(){
+        this.$.ajaxRecaptcha.url = "/recaptcha"
+        this.$.ajaxRecaptcha.body = JSON.stringify(this.formData);
+        this.$.ajaxRecaptcha.generateRequest();
+      }
+
+      sendSMSCode(){
+        this.$.ajaxSMS.url = "/sendsms"
+        this.$.ajaxSMS.body = JSON.stringify(this.formData);
+        this.$.ajaxSMS.generateRequest();
+      }
+
+
+
+      ready(){
+        super.ready()
+
+        console.log("HERE", this.$)
+
+
+      }
+
+
+    }
+
+    window.customElements.define(SignUp.is, SignUp);
+  </script>
+</dom-module>

@@ -1,0 +1,100 @@
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="two-factor">
+  <template>
+    <style include="shared-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+
+      .card {
+        width: 35%;
+        margin: 0 auto;
+      }
+      .visibilityIcon {
+        top: 22px;
+        margin-left: auto;
+      }
+
+
+
+    </style>
+
+    <div class="card">
+      <div class="layout vertical">
+        <div>
+          A code has been sent via SMS to your phone number. Please enter that code below. Two factor authentication is required to register an account.
+        </div>
+        <div>
+          <paper-input label="SMS Code *" auto-validate pattern="[^[0-9]+$" error-message="Your code should only container numbers" value="{{ user.smscode }}"></paper-input>
+        </div>
+
+        <paper-spinner active style="display: [[d.spinner]]; margin: 0 auto;"></paper-spinner>
+
+        <paper-button raised on-tap="validateSMSCode" disabled="[[db]]">
+          Submit
+        </paper-button>
+
+      </div>
+    </div>
+
+   <iron-ajax id="ajaxTwoFactor" method="POST" handle-as="json" content-type="application/json" on-response="authenticate"></iron-ajax>
+
+
+  </template>
+
+  <script>
+    class TwoFactor extends Polymer.Element {
+      static get is() { return 'two-factor'; }
+
+      static get properties() {
+        return {
+            user: {
+              type: Object,
+              notify: true,
+              reflectToAttribute: true,
+              value: {
+                email: ""
+                smscode: ""
+              }
+            },
+            
+          },
+        }
+      
+      static get observers() {
+        return [
+          "userUpdates(user.*)",
+        ]
+      }
+
+      userUpdates(u) {
+        console.log("in userUpdates", u)
+      }
+
+      constructor() {
+        super();
+      }
+
+      validateSMSCode() {
+        this.$.ajaxTwoFactor.url = "/getBalances"
+        this.$.ajaxTwoFactor.body = JSON.stringify(this.apiInfo);
+        this.$.ajaxTwoFactor.generateRequest();
+      }
+
+      authenticate() {
+        console.log("nothing here yet") 
+      }
+
+
+      ready(){
+        super.ready();
+      }
+
+    }
+
+    window.customElements.define(TwoFactor.is, TwoFactor);
+  </script>
+</dom-module>
