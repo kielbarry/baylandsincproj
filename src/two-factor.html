@@ -40,7 +40,7 @@
       </div>
     </div>
 
-   <iron-ajax id="ajaxTwoFactor" method="POST" handle-as="json" content-type="application/json" on-response="authenticate"></iron-ajax>
+   <iron-ajax id="ajaxTwoFactor" method="POST" handle-as="json" content-type="application/json" on-response="nexmoVerification"></iron-ajax>
 
 
   </template>
@@ -51,17 +51,25 @@
 
       static get properties() {
         return {
-            user: {
+            verifyUserPhone: {
               type: Object,
               notify: true,
               reflectToAttribute: true,
               value: {
-                email: ""
+                email: "",
                 smscode: ""
               }
             },
+            d: {
+              type: Object,
+              reflectToAttribute: true,
+              notify: true,
+              value: {
+                spinner: "none",
+              }
+            }
             
-          },
+          }
         }
       
       static get observers() {
@@ -79,9 +87,9 @@
       }
 
       validateSMSCode() {
-        this.$.ajaxTwoFactor.url = "/getBalances"
-        this.$.ajaxTwoFactor.body = JSON.stringify(this.apiInfo);
-        this.$.ajaxTwoFactor.generateRequest();
+        // this.$.ajaxTwoFactor.url = "/verifyNexmo"
+        // this.$.ajaxTwoFactor.body = JSON.stringify(this.apiInfo);
+        // this.$.ajaxTwoFactor.generateRequest();
       }
 
       authenticate() {

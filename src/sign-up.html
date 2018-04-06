@@ -127,9 +127,8 @@
   </div>
   
   <iron-ajax id="ajaxNewEmail" method="PUT" handle-as="json" content-type="application/json" on-response="availableEmail"></iron-ajax>
-  <iron-ajax id="ajaxSignUp" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
+  <iron-ajax id="ajaxSignUp" method="POST" handle-as="json" content-type="application/json" on-response="checkSMSSent"></iron-ajax>
   <iron-ajax id="ajaxRecaptcha" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
-  <iron-ajax id="ajaxSMS" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
 
   </template>
 
@@ -1247,11 +1246,6 @@
             '--button-opacity': 1,
           })
         }
-
-        console.log("validForm", validForm)
-        console.log("formData", this.formData)
-        console.log("conditionalCSS", this.conditionalCSS)
-
       }
 
       signUp(){
@@ -1266,17 +1260,26 @@
       //   this.$.ajaxRecaptcha.generateRequest();
       // }
 
-      sendSMSCode(){
-        this.$.ajaxSMS.url = "/sendsms"
-        this.$.ajaxSMS.body = JSON.stringify(this.formData);
-        this.$.ajaxSMS.generateRequest();
-      }
+      checkSMSSent(resp) {
+        console.log(resp.detail.response)
+        if(resp.detail.response["textSent"] === "success") {
+          this.dispatchEvent(new CustomEvent("pageChange", {
+            detail: {
+              selection: "two-factor",
+              email: resp.detail.response.result["email"]
+            }
+          }))
+        }
+        else {
+          console.log("error message not yet done")
+        }
 
+      }
 
 
       ready(){
         super.ready()
-
+        console.log("asdfasdgadsgasdgJJJJJJJJJ", this.routeData)
         // this.$.captchaDiv.addEventListener("google-recaptcha-response", (e) => {
         //   this.validateForm(this.validForm)
         // })
