@@ -1263,6 +1263,9 @@
       checkSMSSent(resp) {
         console.log(resp.detail.response)
         if(resp.detail.response["textSent"] === "success") {
+          Object.keys(this.formData).map(k => this.set("formData.`${key}`", ""))
+          console.log("is formData empty?", this.formData)
+          this.set("formData", {})
           this.dispatchEvent(new CustomEvent("pageChange", {
             detail: {
               selection: "two-factor",

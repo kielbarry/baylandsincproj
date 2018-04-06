@@ -28,19 +28,19 @@
           A code has been sent via SMS to your phone number. Please enter that code below. Two factor authentication is required to register an account.
         </div>
         <div>
-          <paper-input label="SMS Code *" auto-validate pattern="[^[0-9]+$" error-message="Your code should only container numbers" value="{{ user.smscode }}"></paper-input>
+          <paper-input label="SMS Code *" auto-validate pattern="^[0-9]+$" error-message="Your code should only container numbers" value="{{ verifyUserPhone.nexmoCode }}"></paper-input>
         </div>
 
         <paper-spinner active style="display: [[d.spinner]]; margin: 0 auto;"></paper-spinner>
 
-        <paper-button raised on-tap="validateSMSCode" disabled="[[db]]">
+        <paper-button raised on-tap="validateNexmoCode" disabled="[[d.submitButton]]">
           Submit
         </paper-button>
 
       </div>
     </div>
 
-   <iron-ajax id="ajaxTwoFactor" method="POST" handle-as="json" content-type="application/json" on-response="nexmoVerification"></iron-ajax>
+   <iron-ajax id="ajaxTwoFactor" method="PUT" handle-as="json" content-type="application/json" on-response="nexmoVerification"></iron-ajax>
 
 
   </template>
@@ -57,7 +57,7 @@
               reflectToAttribute: true,
               value: {
                 email: "",
-                smscode: ""
+                nexmoCode: ""
               }
             },
             d: {
@@ -66,30 +66,33 @@
               notify: true,
               value: {
                 spinner: "none",
+                submitButton: true,
               }
-            }
+            },
             
           }
         }
       
       static get observers() {
         return [
-          "userUpdates(user.*)",
+          "userUpdates(verifyUserPhone.*)",
         ]
       }
 
       userUpdates(u) {
         console.log("in userUpdates", u)
+        console.log("in userUpdates", u.base)
+        if(u.base.email && u.base.nexmoCode) this.set("d.submitButton", false)
       }
 
       constructor() {
         super();
       }
 
-      validateSMSCode() {
-        // this.$.ajaxTwoFactor.url = "/verifyNexmo"
-        // this.$.ajaxTwoFactor.body = JSON.stringify(this.apiInfo);
-        // this.$.ajaxTwoFactor.generateRequest();
+      validateNexmoCode() {
+        this.$.ajaxTwoFactor.url = "/verifyNexmo"
+        this.$.ajaxTwoFactor.body = JSON.stringify(this.verifyUserPhone);
+        this.$.ajaxTwoFactor.generateRequest();
       }
 
       authenticate() {

@@ -34,14 +34,17 @@ async function getCoinbaseHoldings(req) {
 		return obj.data.amount;
 	});
 	await cbclient.getAccounts({}, (err, accounts) => {
-		var arr = accounts.map(acct => {
-			cb.coinname = acct.currency;
-			cb.coinamount = acct.balance.amount;
-			cb.coinvalue = parseFloat(bitPrice) / parseFloat(acct.native_balance.amount);
-			cb.usdbalance = acct.native_balance.amount;
-			cb.exchange = "Coinbase"
-			return cb
-		})
+		if(err) return err
+		else {
+			var arr = accounts.map(acct => {
+				cb.coinname = acct.currency;
+				cb.coinamount = acct.balance.amount;
+				cb.coinvalue = parseFloat(bitPrice) / parseFloat(acct.native_balance.amount);
+				cb.usdbalance = acct.native_balance.amount;
+				cb.exchange = "Coinbase"
+				return cb
+			})
+		}
 	}).then((arr) => {
 		console.log(arr)
 	})
