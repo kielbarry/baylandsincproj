@@ -61,16 +61,20 @@
 
             <div class="layout horizontal">
               <paper-input label="First Name *" auto-validate pattern="[a-zA-Z]*" error-message="This field only accepts letters."
-              value="{{formData.firstname}}"></paper-input>
+              value="{{formData.firstname}}"
+              on-focusout="allFieldsInput"></paper-input>
               <paper-input class="secondInput" label="Last Name *" auto-validate pattern="[a-zA-Z]*" error-message="This field only accepts letters."
-              value="{{formData.lastname}}"></paper-input>
+              value="{{formData.lastname}}"
+              on-focusout="allFieldsInput"></paper-input>
             </div>
 
             <div class="layout horizontal">
               <paper-input label="Phone Number *"  auto-validate pattern="^[0-9]+$"  error-message="This field only accepts numbers" 
-              value="{{ formData.phoneNumber }}">
+              value="{{ formData.phoneNumber }}"
+              on-focusout="allFieldsInput">
               </paper-input>
-              <paper-input class="secondInput" value="{{ formData.email }}" label="Email *" on-keyup="newEmail"></paper-input>
+              <paper-input class="secondInput" value="{{ formData.email }}" label="Email *" on-keyup="newEmail"
+              on-focusout="allFieldsInput"></paper-input>
               <!-- <iron-icon icon="icons:check-circle"></iron-icon>
               <iron-icon icon="icons:cancel"></iron-icon> -->
             </div>
@@ -81,8 +85,12 @@
               auto-validate pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}"
               error-message="Invalid password"
               type$="{{pwType}}"
-              value="{{formData.password}}"></paper-input>
-              <paper-input id="confirmPasswordInput" class="secondInput" label="Confirm Password *" type$="{{pwType}}" value="{{formData.confirmPassword}}" on-keyup="validatePassword">
+              value="{{formData.password}}"
+              on-focusout="allFieldsInput"
+              ></paper-input>
+              <paper-input id="confirmPasswordInput" class="secondInput" label="Confirm Password *" type$="{{pwType}}" value="{{formData.confirmPassword}}" on-keyup="validatePassword"
+              on-focusout="allFieldsInput"
+              >
               </paper-input>
               
               <paper-icon-button class="visibilityIcon" icon$="{{displayVisibleIcon}}"
@@ -92,13 +100,14 @@
             <!-- <div id="captchaDiv" style="overflow: auto;"> -->
               
               <!-- scroll-target="captchaDiv" -->
-              <google-recaptcha
+<!--               <google-recaptcha
+              id="captchaDiv"
               style="width: 100%; margin-left: 0 auto; margin-right: 0 auto; top: 15px;"
               force-in-body
-              
               value="{{ formData.g-recaptcha-response}}"
               sitekey="6LeGhz8UAAAAACUWRQ1J2aSPOVZ4ixXU5O_MvpHH"
-              ></google-recaptcha>
+              responseCallback="test"
+              ></google-recaptcha> -->
             <!-- </div> -->
 
             <div class="layout horizontal" style="margin-top:15px">
@@ -152,10 +161,9 @@
               'lastname': '',
               'email': '',
               'password': '',
-              // 'repeatpassword': '',
               'confirmPassword': '',
               'phoneNumber': '',
-              'g-recaptcha-response': '',
+              // 'g-recaptcha-response': '',
             },
           },
           conditionalCSS: {
@@ -172,7 +180,8 @@
             value: {
               'passwordvalid': false,
               'passwordsmatch': false,
-              'allfields' : false,
+              // 'allfields' : false,
+              'allfields' : true,
             },
             reflectToAttribute: true,
             notify: true,
@@ -1131,14 +1140,13 @@
 
       static get observers(){
         return [
-        'validateForm(validForm.*)'
+        'validateForm(validForm.*)',
         ]
       }
 
       constructor(){
         super()
       }
-
 
       newEmail() {
         var e = this.formData.email;
@@ -1172,7 +1180,6 @@
 
 
       allFieldsInput(){
-
         var blanks = false;
         Object.keys(this.formData).map(key => {
           if(this.formData[key] === ''){
@@ -1204,28 +1211,24 @@
       }
 
       validatePassword() {
+        console.log("here in validatePassword")
         if(this.formData.password === this.formData.confirmPassword) {
           this.set('validForm.passwordsmatch', true);
         }
         else {
           this.set('validForm.passwordsmatch', false);
         }
+        var valid = this.formData.password.match(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}/)
+        valid === null ? 
+          this.set('conditionalCSS.invalidwarning', 'block') : 
+          this.set('conditionalCSS.invalidwarning', 'none')
+
+        valid === null ? 
+          this.set('validForm.passwordvalid', false) : 
+          this.set('validForm.passwordvalid', true)
       }
 
-      // validatePassword(){
-      //   var valid = this.formData.password.match(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}/)
-      //   valid === null ? 
-      //     this.set('conditionalCSS.invalidwarning', 'block') : 
-      //     this.set('conditionalCSS.invalidwarning', 'none')
-
-      //   valid === null ? 
-      //     this.set('validForm.passwordvalid', false) : 
-      //     this.set('validForm.passwordvalid', true)
-
-      // }
-
       validateForm(validForm){
-
         var valid = true
         Object.keys(this.validForm).some(key => {
           if(this.validForm[key] === false) {
@@ -1238,11 +1241,17 @@
         })
 
         if(valid){
+          this.set('conditionalCSS.disabledbutton', "") 
           this.set('conditionalCSS.disabledbutton', false) 
           this.updateStyles({
             '--button-opacity': 1,
           })
         }
+
+        console.log("validForm", validForm)
+        console.log("formData", this.formData)
+        console.log("conditionalCSS", this.conditionalCSS)
+
       }
 
       signUp(){
@@ -1251,11 +1260,11 @@
         this.$.ajaxSignUp.generateRequest();
       }
 
-      verifyRecaptcha(){
-        this.$.ajaxRecaptcha.url = "/recaptcha"
-        this.$.ajaxRecaptcha.body = JSON.stringify(this.formData);
-        this.$.ajaxRecaptcha.generateRequest();
-      }
+      // verifyRecaptcha(){
+      //   this.$.ajaxRecaptcha.url = "/recaptcha"
+      //   this.$.ajaxRecaptcha.body = JSON.stringify(this.formData);
+      //   this.$.ajaxRecaptcha.generateRequest();
+      // }
 
       sendSMSCode(){
         this.$.ajaxSMS.url = "/sendsms"
@@ -1268,8 +1277,9 @@
       ready(){
         super.ready()
 
-        console.log("HERE", this.$)
-
+        // this.$.captchaDiv.addEventListener("google-recaptcha-response", (e) => {
+        //   this.validateForm(this.validForm)
+        // })
 
       }
 
