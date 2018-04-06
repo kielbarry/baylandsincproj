@@ -10,14 +10,15 @@ PORT = process.env.PORT || 3000,
 bodyParser = require("body-parser"),
 request = require("request"),
 URL = require("url-parser"),
-Nexmo = require('nexmo'),
-nexmo = new Nexmo({
-  apiKey: process.env.NEXMOKEY,
-  apiSecret: process.env.NEXMOSECRET
-}),
+// Nexmo = require('nexmo'),
+// nexmo = new Nexmo({
+//   apiKey: process.env.NEXMOKEY,
+//   apiSecret: process.env.NEXMOSECRET
+// }),
 redis = require("redis"),
 redisClient = redis.createClient(),
 handler = require("./backendFunctions/handlers.js"),
+nexmoHandler = require("./backendFunctions/nexmoHandlers.js"),
 rcsk = process.env.recaptchaSecret;
 
 
@@ -44,56 +45,16 @@ app.put("/newEmail", (req, res) => {
 })
 
 app.post("/signup", (req, res) => {
-	console.log("req.body in signup", req.body)
 	if (!req.body) return res.sendStatus(400)
-	//currently removed recaptcha from FE
-	// if([undefined, '', null].includes(req.body['g-recaptcha-response'])) {
- //      return res.json({"responseCode" : 1,"responseDesc" : "Please select captcha"});
- // 	}
-	// var verificationUrl = "https://www.google.com/recaptcha/api/siteverify?secret=" + rcsk + "&response=" + req.body['g-recaptcha-response'] + "&remoteip=" + req.connection.remoteAddress;
-	// request(verificationUrl, (error, response, body) => {
-	// 	body = JSON.parse(body);
-	// 	if(body.success !== undefined && !body.success) {
-	// 	  return res.json({"responseCode" : 1, "responseDesc" : body["error-codes"]});
-	// 	}
-	// })
-
-	// redisClient.HSET(req.body.email)
-	console.log(req.body.phoneNumber)
-	nexmo.verify.request({number: req.body.phoneNumber, brand: "Kiel Barry"}, function (err, result) {
-	  if(err || result.error_text) { console.error(err || result.error_text); }
-	  else {
-	    redisClient.set(req.body.email, result.request_id)
-	    // redisClient.expireat(req.body.email)
-	    res.json({"result": req.body, "textSent": "success"})
-	  }
-	});
-
+	nexmoHandler.signUp(req, res)
 });
 
 app.put("/cancelNexmo", (req, res) => {
-
-	redisClient.get(req.body.email, function(err, reply) {
-	    if(err) res.sendStatus(400)
-		nexmo.verify.control({request_id: reply, cmd: 'cancel'}, function(err, result) {
-		  if(err || result.error_text) { console.error(err, result.error_text); }
-		  else {
-		   res.json({"result": req.body, "textCanceled": "success"})
-		  }
-		});
-	});
+	nexmoHandler.cancel(req, res)
 })
 
 app.put("/verifyNexmo", (req, res) => {
-	redisClient.get(req.body.email, function(err, reply) {
-	    if(err) res.sendStatus(400)
-		nexmo.verify.check({request_id: reply, code: req.body.nexmoCode}, function(err, result) {
-		  if(err || result.error_text) { console.error(err || result.error_text); }
-		  else {
-		   res.json({"result": req.body, "textVerified": "success"})
-		  }
-		});
-	});
+	nexmoHandler.verify(req, res)
 })
 
 
