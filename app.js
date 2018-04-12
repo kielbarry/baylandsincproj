@@ -10,6 +10,21 @@ PORT = process.env.PORT || 3000,
 bodyParser = require("body-parser"),
 request = require("request"),
 URL = require("url-parser"),
+
+initDb = require("./db/init.js"),
+pg = require('pg'),
+{ Client } = require('pg'),
+username = process.env.PGUSER,
+password = process.env.PGPASSWORD,
+host = process.env.PGHOST,
+database = process.env.PGDATABASE,
+port = process.env.PGPORT,
+connectionString = process.env.DATABASE_URL || `postgres://${username}:${password}@${host}:${port}/${database}`,
+client = new pg.Client(connectionString);{}
+
+
+
+
 salt = process.env.BCRYPT_SALT,
 jwt = require("jsonwebtoken"),
 jwtToken = process.env.JWT_TOKEN,
@@ -21,6 +36,11 @@ redisClient = redis.createClient(redisPort, redisHost),
 handler = require("./backendFunctions/handlers.js"),
 nexmoHandler = require("./backendFunctions/nexmoHandlers.js"),
 rcsk = process.env.recaptchaSecret;
+
+
+client.connect()
+
+initDb.initQuery();
 
 
 app
