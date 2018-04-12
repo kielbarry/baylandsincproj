@@ -1,4 +1,6 @@
-require("dotenv").config();
+require("dotenv").config({ path : path.join(__dirname, "../.env") })
+
+
 
 const 
 Nexmo = require('nexmo'),
@@ -10,6 +12,8 @@ redis = require("redis"),
 redisPort = process.env.REDIS_PORT,
 redisHost = process.env.REDIS_HOST,
 redisClient = redis.createClient(redisPort, redisHost);
+
+
 
 
 
@@ -27,14 +31,29 @@ function signUp(req, res) {
 	    res.json({"result": req.body, "textSent": "success"})
 	  }
 
+	try{
+		await client.connect();
+		var res = await client.query(str);
+		await client.end();
+	} catch(error) {
+		console.log(error)
+	}
 
-	 	bcrypt.hash(req.body.password, salt, function(err, hash) {
-		  // Store hash in your password DB.
-		});
+	// var u = red.body
 
-
-
-	});
+ // 	bcrypt.hash(req.body.password, salt, function(err, hash) {
+	//   	try{
+	// 		await client.connect();
+	// 		var res = await client.query(`INSERT INTO users (id, 
+	// 			versionid, createdat, firstname, lastname, 
+	// 			fullname, email, passwordHash, activationCode, 
+	// 			emailVerified, phoneVerified) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11",`, [...user]);
+	// 			await client.end();
+	// 	} 
+	// 	catch(error) {
+	// 		console.log(error)
+	// 	}
+	// });
 }
 
 function cancel(req, res) {

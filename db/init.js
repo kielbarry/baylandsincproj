@@ -37,9 +37,7 @@ async function initQuery() {
 	CREATE INDEX IF NOT EXISTS exchange_idx ON exchanges (lower(exchange));
 
 `	
-	models.exchanges.map((x, i) =>{
-		str += "INSERT INTO exchanges (id, exchange) VALUES(" + (i+1) + ", '" + x + "') ON CONFLICT DO NOTHING; "
-	})
+	models.exchanges.map((x, i) => xsstr += "INSERT INTO exchanges (id, exchange) VALUES(" + (i+1) + ", '" + x + "') ON CONFLICT DO NOTHING; ")
 
 	try{
 		await client.connect();
