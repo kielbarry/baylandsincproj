@@ -11,7 +11,6 @@ module.exports = {
             'lastname': '',
             'fullname': '',
             'email': '',
-            'passwordHash': '',
             'phoneNumber': '',
             'emailverified': '',
             'phoneNumberVerified': '',

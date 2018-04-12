@@ -63,34 +63,23 @@ async function createUser(req, res, next) {
 
 
  	bcrypt.hash(req.body.password, parseInt(salt), async function(err, hash) {
- 		// console.log("models.user", models.user)
- 		console.log("req.body.password", req.body.password)
- 		console.log("hash", hash)
- 		console.log("salt", salt)
 	  	try{
 			await client.connect();
-			var result = await client.query(`INSERT INTO users ( 
+			var pgresult = await client.query(`INSERT INTO users ( 
 				versionid, createdat, firstname, lastname, 
 				fullname, email, passwordHash, phonenumber,
-				emailverified, phoneverified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`,
-				[
-				models.user.versionid,
-				models.user.createdat,
-				models.user.firstname,
-				models.user.lastname,
-				models.user.fullname,
-				models.user.email,
-				hash,
-				models.user.phoneNumber.toString(),
-				false,
-				false
-				]);
+				emailverified, phoneverified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *;`,
+				[ "0", new Date(), req.body.firstname, req.body.lastname, 
+				req.body.firstname + " " + req.body.lastname, req.body.email, 
+				hash, req.body.phoneNumber.toString(), false, false]);
 			await client.end();
-			console.log("result at bottom", result)
 
+			models.user.id =  pgresult.rows[0].id
+			models.user.createdat = pgresult.rows.createdat
+			res.status(200).json({result: models.user, message: "auth failure"})
 		} 
 		catch(error) {
-			console.log(error)
+			res.status(401).json({result:error.message, message: "failed to create user"})
 		}
 	});
 }
