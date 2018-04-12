@@ -93,7 +93,7 @@ app.put("/login", (req, res) => {
 
 
 
-app.put("/getBalances", checkAuth, (req, res) => {
+app.put("/getBalances", checkAuth.check, (req, res) => {
 	if (!req.body) return res.sendStatus(400)
 	handler.getExchangeHoldings(req).then(resp => res.send(resp))
 })

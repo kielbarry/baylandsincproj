@@ -15,17 +15,17 @@ client = new pg.Client(conn);
 
 async function initQuery() {
 	var str = `CREATE TABLE IF NOT EXISTS users (
-		id INTEGER PRIMARY KEY,
+		id SERIAL PRIMARY KEY,
 		versionid varchar(64),
 		createdat DATE,
 		firstname varchar(64),
 		lastname varchar(64),
 		fullname NAME,
 		email varchar(64) NOT NULL UNIQUE,
+		phonenumber varchar(64),
 		passwordHash varchar(64) NOT NULL,
-		activationCode varchar(64) NOT NULL,
-		emailVerified BOOLEAN,
-		phoneVerified BOOLEAN
+		emailverified BOOLEAN,
+		phoneverified BOOLEAN
 	);
 	CREATE INDEX IF NOT EXISTS email_idx ON users (lower(email));
 	CREATE INDEX IF NOT EXISTS full_name_idx ON users (lower(fullname));
@@ -36,8 +36,8 @@ async function initQuery() {
 	);
 	CREATE INDEX IF NOT EXISTS exchange_idx ON exchanges (lower(exchange));
 
-`	
-	models.exchanges.map((x, i) => xsstr += "INSERT INTO exchanges (id, exchange) VALUES(" + (i+1) + ", '" + x + "') ON CONFLICT DO NOTHING; ")
+`	// data stored on backend, no sqlinjection anticipated
+	models.exchanges.map((x, i) => str += "INSERT INTO exchanges (id, exchange) VALUES(" + (i+1) + ", '" + x + "') ON CONFLICT DO NOTHING; ")
 
 	try{
 		await client.connect();

@@ -30,7 +30,7 @@ async function getCoinbaseHoldings(req) {
 		exchange: '',
 	}
 	var bitPrice = await cbclient.getBuyPrice({'currencyPair': 'BTC-USD'}, function(err, obj) {
-dds		return obj.data.amount;
+		return obj.data.amount;
 	});
 	await cbclient.getAccounts({}, (err, accounts) => {
 		if(err) return err

@@ -4,16 +4,18 @@ const exchanges = ["Bitfinex", "coinone", "Kraken", "Coinbase", "GDAX", "Bitstam
 
 module.exports = {
       user: {
+            'id': '',
+            'versionid': '',
+            'createdat': '',
             'firstname': '',
             'lastname': '',
+            'fullname': '',
             'email': '',
-            'emailverified': '',
-            'password': '',
-            'repeatpassword': '',
-            'hash': '',
+            'passwordHash': '',
             'phoneNumber': '',
+            'emailverified': '',
             'phoneNumberVerified': '',
-            'g-recaptcha-response': '',
+
       },
       exchanges: exchanges
 }
