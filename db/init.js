@@ -25,7 +25,8 @@ async function initQuery() {
 		phonenumber varchar(64),
 		passwordHash varchar(64) NOT NULL,
 		emailverified BOOLEAN,
-		phoneverified BOOLEAN
+		phoneverified BOOLEAN,
+		CONSTRAINT singleversion UNIQUE(id, versionid)
 	);
 	CREATE INDEX IF NOT EXISTS email_idx ON users (lower(email));
 	CREATE INDEX IF NOT EXISTS full_name_idx ON users (lower(fullname));
@@ -35,9 +36,49 @@ async function initQuery() {
 		exchange NAME
 	);
 	CREATE INDEX IF NOT EXISTS exchange_idx ON exchanges (lower(exchange));
+	
+	CREATE TABLE IF NOT EXISTS coinbaselistings (
+		id SERIAL PRIMARY KEY NOT NUll,
+		versionid varchar(64) NOT NULL,
+		userid INTEGER NOT NULL,
+		userversionid varchar(64) NOT NULL,
+		createdat DATE,
+		BTC DOUBLE PRECISION,
+		ETH DOUBLE PRECISION,
+		LTC DOUBLE PRECISION,
+		BCH DOUBLE PRECISION,
+		FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid)
+	);
 
+	CREATE TABLE IF NOT EXISTS gdaxlistings (
+		id SERIAL PRIMARY KEY NOT NUll,
+		versionid varchar(64) NOT NULL,
+		userid INTEGER NOT NULL,
+		userversionid varchar(64) NOT NULL,
+		createdat DATE,
+		BTC DOUBLE PRECISION,
+		ETH DOUBLE PRECISION,
+		LTC DOUBLE PRECISION,
+		BCH DOUBLE PRECISION,
+		FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid)
+	);
 `	// data stored on backend, no sqlinjection anticipated
 	models.exchanges.map((x, i) => str += "INSERT INTO exchanges (id, exchange) VALUES(" + (i+1) + ", '" + x + "') ON CONFLICT DO NOTHING; ")
+
+	var str2 = `	CREATE TABLE IF NOT EXISTS poloniexlistings (
+		id SERIAL PRIMARY KEY NOT NUll,
+		versionid varchar(64) NOT NULL,
+		userid INTEGER NOT NULL,
+		userversionid varchar(64) NOT NULL,
+		createdat DATE,
+		`
+
+	models.poloniexListings.map(coin => str2 += (" " + coin + " DOUBLE PRECISION,"));
+
+	str2 += " FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid));"
+
+	str += str2
+
 
 	try{
 		await client.connect();
