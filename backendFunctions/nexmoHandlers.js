@@ -3,18 +3,20 @@ require("dotenv").config();
 const 
 Nexmo = require('nexmo'),
 nexmo = new Nexmo({
-  apiKey: process.env.NEXMOKEY,
-  apiSecret: process.env.NEXMOSECRET
+  apiKey: process.env.NEXMO_KEY,
+  apiSecret: process.env.NEXMO_SECRET
 }),
 redis = require("redis"),
-redisClient = redis.createClient();
+redisPort = process.env.REDIS_PORT,
+redisHost = process.env.REDIS_HOST,
+redisClient = redis.createClient(redisPort, redisHost);
 
 
 
 module.exports = {
 	signUp,
 	cancel,
-	verify,
+	verify
 }
 
 function signUp(req, res) {
@@ -24,6 +26,14 @@ function signUp(req, res) {
 	    redisClient.set(req.body.email, result.request_id)
 	    res.json({"result": req.body, "textSent": "success"})
 	  }
+
+
+	 	bcrypt.hash(req.body.password, salt, function(err, hash) {
+		  // Store hash in your password DB.
+		});
+
+
+
 	});
 }
 

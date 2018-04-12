@@ -3,20 +3,21 @@ require("dotenv").config();
 const
 express = require("express"),
 app = express(),
-router = express.Router()
+router = express.Router(),
 http = require("http"),
 path = require("path"),
 PORT = process.env.PORT || 3000,
 bodyParser = require("body-parser"),
 request = require("request"),
 URL = require("url-parser"),
-// Nexmo = require('nexmo'),
-// nexmo = new Nexmo({
-//   apiKey: process.env.NEXMOKEY,
-//   apiSecret: process.env.NEXMOSECRET
-// }),
+salt = process.env.BCRYPT_SALT,
+jwt = require("jsonwebtoken"),
+jwtToken = process.env.JWT_TOKEN,
+checkAuth = require("./backendFunctions/auth.js"),
 redis = require("redis"),
-redisClient = redis.createClient(),
+redisPort = process.env.REDIS_PORT,
+redisHost = process.env.REDIS_HOST,
+redisClient = redis.createClient(redisPort, redisHost),
 handler = require("./backendFunctions/handlers.js"),
 nexmoHandler = require("./backendFunctions/nexmoHandlers.js"),
 rcsk = process.env.recaptchaSecret;
@@ -57,8 +58,22 @@ app.put("/verifyNexmo", (req, res) => {
 	nexmoHandler.verify(req, res)
 })
 
+app.put("/login", (req, res) => {
+	if(!req.body) return res.sendStatus(400)
+	bcrypt.compare(req.body.password, hash, function(err, result) {
+		if(err || !result) res.status(401).json({message: "auth failure"});
+	    else {
+	    	const t = jwt.sign({email: req.body.email, id: req.body._id}, 
+	    		jwtToken,
+	    		{expiresIn: "2 days"});
+	    	return res.status(200).json({message: "auth successful", token: t}, );
+	    }
+	});
+})
 
-app.put("/getBalances", (req, res) => {
+
+
+app.put("/getBalances", checkAuth, (req, res) => {
 	if (!req.body) return res.sendStatus(400)
 	handler.getExchangeHoldings(req).then(resp => res.send(resp))
 })

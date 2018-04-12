@@ -14,12 +14,14 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "coinbase": "^2.0.7",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "g": "^2.0.1",
     "http": "0.0.0",
+    "jsonwebtoken": "^8.2.1",
     "morgan": "^1.9.0",
     "nexmo": "^2.2.0",
     "path": "^0.12.7",
@@ -34,5 +36,13 @@
   "directories": {
     "test": "test"
   },
-  "author": ""
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kielbarry/baylandsincproj.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kielbarry/baylandsincproj/issues"
+  },
+  "homepage": "https://github.com/kielbarry/baylandsincproj#readme"
 }

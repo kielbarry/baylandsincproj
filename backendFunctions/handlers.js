@@ -1,6 +1,6 @@
 const 
 https = require('https'),
-axios = require('axios')
+axios = require('axios'),
 coinbase = require('coinbase');
 
 
