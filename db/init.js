@@ -79,6 +79,18 @@ async function initQuery() {
 
 	str += str2
 
+	str3 = 	`CREATE TABLE IF NOT EXISTS usersexchanges (
+		id SERIAL PRIMARY KEY NOT NUll,
+		versionid varchar(64) NOT NULL,
+		userid INTEGER NOT NULL,
+		userversionid varchar(64) NOT NULL,
+		createdat DATE,`
+	models.exchanges.map((x, i) => str3 += x + " BOOLEAN,")
+
+	str3 += " FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid));" 
+
+	str += str3
+
 
 	try{
 		await client.connect();

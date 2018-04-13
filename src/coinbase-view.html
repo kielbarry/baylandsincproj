@@ -22,6 +22,19 @@
   <script>
     class CoinbaseView extends Polymer.Element {
       static get is() { return 'coinbase-view'; }
+    
+      static get properties() {
+        return {
+          user: {
+            type: Object,
+            notify: true,
+            reflectToAttribute: true,
+            value:{}
+          },
+        }
+      }
+
+
     }
 
     window.customElements.define(CoinbaseView.is, CoinbaseView);

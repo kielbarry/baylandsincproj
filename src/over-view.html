@@ -43,7 +43,7 @@
 
     <app-drawer id="enterAPIPanel" slot="drawer" swipe-open="[[narrow]]" align="right">
       <div class="drawer-content">
-        <enter-api-panel id="enterAPIPanel" exchange-name="{{exchangeForBalances}}"></enter-api-panel>
+        <enter-api-panel id="enterAPIPanel" exchange-name="{{exchangeForBalances}}" user="{{user}}"></enter-api-panel>
       </div>
     </app-drawer>
 
@@ -63,7 +63,13 @@
             notify: true,
             // reflectToAttribute: true,
             // value: "",
-          }
+          },
+          user: {
+            type: Object,
+            notify: true,
+            reflectToAttribute: true,
+            value:{}
+          },
         }
       }
 
@@ -72,6 +78,7 @@
       }
 
       openExchangesList(){
+        console.log("this.suser in openExchangesList", this.user)
         this.$.drawer.toggle();
       }
 

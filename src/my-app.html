@@ -58,9 +58,9 @@
         display: block;
       }
 
-      app-drawer-layout:not([narrow]) [drawer-toggle] {
+     /* app-drawer-layout:not([narrow]) [drawer-toggle] {
         display: none;
-      }
+      }*/
 
       app-header {
         color: #fff;
@@ -163,11 +163,7 @@
         pattern="[[rootPath]]:page"
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
-
-    <app-drawer-layout fullbleed narrow="{{narrow}}">
-      <!-- Drawer content -->
-      <div style="display: [[authenticated.postauth]]">
-        <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
+        <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]" drawer-toggle style="z-index: 1"> 
           <app-toolbar>Menu</app-toolbar>
           <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
             <a name="over-view" href="[[rootPath]]over-view">Overview</a>
@@ -178,12 +174,30 @@
             </iron-list>'
           </iron-selector>
         </app-drawer>
-      </div>
+
+    <app-drawer-layout fullbleed narrow="{{narrow}}">
+      <!-- Drawer content -->
+      <!-- <div style="display: [[authenticated.postauth]]"> -->
+<!--         <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]" drawer-toggle> 
+          <app-toolbar>Menu</app-toolbar>
+          <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+            <a name="over-view" href="[[rootPath]]over-view">Overview</a>
+            <iron-list items="[[pageList]]" as="page">
+              <template>
+                <a name="[[page.name]]" href="[[rootPath]][[page.path]]"> {{ page.title }}</a>
+              </template>
+            </iron-list>'
+          </iron-selector>
+        </app-drawer> -->
+      <!-- </div> -->
       <!-- Main content -->
       <app-header-layout has-scrolling-region fullbleed>
         <app-header slot="header" condenses reveals effects="waterfall">
+
           <app-toolbar>
-            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+            <div style="display: [[authenticated.postauth]]">
+              <paper-icon-button icon="my-icons:menu" drawer-toggle on-click="closeMenu"></paper-icon-button>
+            </div>
             <div id="main-title" main-title>
             Prosophia
             </div>
@@ -234,10 +248,10 @@
         </div>
 
         <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view-404" role="main">
-          <over-view name="over-view"></over-view>
-          <poloniex-view name="poloniex-view"></poloniex-view>
-          <coinbase-view name="coinbase-view"></coinbase-view>
-          <log-in id="logIn" name="log-in"></log-in>
+          <over-view name="over-view" user="{{user}}"></over-view>
+          <poloniex-view name="poloniex-view" user="{{user}}"></poloniex-view>
+          <coinbase-view name="coinbase-view" user="{{user}}"></coinbase-view>
+          <log-in id="logIn" name="log-in" user="{{user}}"></log-in>
           <sign-up id="signUp" name="sign-up" user="{{user}}"></sign-up>
 
           <profile-page id="profilePage" name="profile-page" user="{{user}}"></profile-page>
@@ -426,6 +440,12 @@
         this.set("user", {})
       }
 
+      closeMenu(){
+        console.log(this.$.drawer)
+        this.$.drawer.toggle();
+        // this.$.testing.resetLayout()
+      }
+
 
       
       ready(){
@@ -434,6 +454,9 @@
         this.getMinAndMaxCoinPrice();
 
         this.$.logIn.addEventListener("pageChange", (e)=> {
+
+          console.log("this.user in my-app login", this.user)
+
           console.log("e.detail here in login myapp", e.detail)
           this.set("isAuth", true);
           this.set("authenticated.preauth", "none");

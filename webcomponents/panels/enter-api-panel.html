@@ -156,7 +156,13 @@
               spinner: "none",
               success: "none"
             }
-          }
+          },
+          user: {
+            type: Object,
+            notify: true,
+            reflectToAttribute: true,
+            value: {}
+          },
         }
       }
 
@@ -171,18 +177,17 @@
         ];
       }
       exchangeUpdate(exchangeName){
+        console.log("exchangeName", exchangeName)
         this.set("apiInfo.exchange", this.exchangeName.toLowerCase())
       }
 
       allInfo(ai){
         if(ai.base["apiKey"] && ai.base["apiSecret"] && ai.base["exchange"]) {
-          console.log("all true")
           this.set('db', "")
           this.set('db', false)
           this.notifyPath("db")
         }
         else {
-          console.log("some false", ai)
           this.set('db', true)
           this.notifyPath("db")
         }
@@ -199,7 +204,7 @@
         
 
         this.$.getBalances.url = "/getBalances"
-        this.$.getBalances.body = JSON.stringify(this.apiInfo);
+        this.$.getBalances.body = JSON.stringify({apiInfo:this.apiInfo, user: this.user});
         this.$.getBalances.generateRequest();
       }
 
