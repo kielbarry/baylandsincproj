@@ -69,6 +69,18 @@
                 submitButton: true,
               }
             },
+            user: {
+              type: Object,
+              notify: true,
+              reflectToAttribute: true,
+              value: {}
+            },
+            timer: {
+              type: String,
+              notify: true,
+              reflectToAttribute: true,
+              value:""
+            },
             
           }
         }
@@ -82,20 +94,39 @@
       userUpdates(u) {
         console.log("in userUpdates", u)
         console.log("in userUpdates", u.base)
-        if(u.base.email && u.base.nexmoCode) this.set("d.submitButton", false)
+        console.log("this.user in twofactor", this.user)
+
+        if(u.base.email && u.base.nexmoCode) {
+          this.set("d.submitButton", false);
+          this.set("user.nexmoCode", "")
+          this.set("user.nexmoCode", u.base.nexmoCode)
+        }
       }
 
       constructor() {
         super();
+        this.timerFunction();
       }
 
+      timerFunction(){
+        var countdown = new Date().getTime();
+        setInterval(() => {
+          this.set("timer", countdown - new Date().getTime());
+          console.log(this.timer)
+        }, 1000);
+      }
+
+
       validateNexmoCode() {
+        console.log("this.user in validateNexmoCode", this.user)
         this.$.ajaxTwoFactor.url = "/verifyNexmo"
-        this.$.ajaxTwoFactor.body = JSON.stringify(this.verifyUserPhone);
+        this.$.ajaxTwoFactor.body = JSON.stringify(this.user);
         this.$.ajaxTwoFactor.generateRequest();
       }
 
       nexmoVerification(resp) {
+        this.set("user.nexmoCode", "");
+        this.set("user.phoneNumberVerified", true)
         console.log("here is response", resp.detail.response)
       }
 

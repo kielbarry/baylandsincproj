@@ -14,8 +14,8 @@ const
 	host = process.env.PGHOST,
 	database = process.env.PGDATABASE,
 	port = process.env.PGPORT,
-	conn = process.env.DATABASE_URL || `postgres://${username}:${password}@${host}:${port}/${database}`,
-	client = new pg.Client(conn);
+	conn = process.env.DATABASE_URL || `postgres://${username}:${password}@${host}:${port}/${database}`;
+	// client = new pg.Client(conn);
 
 
 // module.exports = (req, res, next) => {
@@ -33,7 +33,8 @@ const
 
 module.exports = {
 	check: checkAuth,
-	createUser
+	createUser,
+	verifyNexmo
 }
 
 async function checkAuth (req, res, next) {
@@ -52,7 +53,6 @@ async function checkAuth (req, res, next) {
 
 
 async function createUser(req, res, next) {
-
 	models.user.versionid = "0";
 	models.user.createdat = new Date();
 	models.user.firstname = req.body.firstname ;
@@ -60,10 +60,12 @@ async function createUser(req, res, next) {
 	models.user.fullname = req.body.firstname + " " + req.body.lastname;
 	models.user.email = req.body.email;
 	models.user.phoneNumber = req.body.phoneNumber;
-
-
+	const t = jwt.sign({email: req.body.email, id: req.body._id}, jwtToken, {expiresIn: "2 days"});
  	bcrypt.hash(req.body.password, parseInt(salt), async function(err, hash) {
 	  	try{
+
+	  		const client = new pg.Client(conn);
+
 			await client.connect();
 			var pgresult = await client.query(`INSERT INTO users ( 
 				versionid, createdat, firstname, lastname, 
@@ -72,17 +74,46 @@ async function createUser(req, res, next) {
 				[ "0", new Date(), req.body.firstname, req.body.lastname, 
 				req.body.firstname + " " + req.body.lastname, req.body.email, 
 				hash, req.body.phoneNumber.toString(), false, false]);
-			await client.end();
 
-			models.user.id =  pgresult.rows[0].id
-			models.user.createdat = pgresult.rows.createdat
-			res.status(200).json({result: models.user, message: "auth failure"})
+			await client.end((err) => {
+				if(err) res.status(401).json({result:err, message: "failed to create user"});
+				else {
+					models.user.id =  pgresult.rows[0].id
+					models.user.createdat = pgresult.rows.createdat
+					res.status(296).json({result: models.user, token: t, message: "success sign up"})
+				}
+			});
 		} 
 		catch(error) {
 			res.status(401).json({result:error.message, message: "failed to create user"})
 		}
 	});
 }
+
+async function verifyNexmo(req, res, next) {
+	try{
+		const client = new pg.Client(conn);
+
+		await client.connect();
+		var pgresult = await client.query(`UPDATE users SET phoneverified = $1 WHERE id=$2 and versionid=$3`, [true, req.body.id, req.body.versionid]);
+		await client.end((err) => {
+			if(err) res.status(401).json({result:err, message: "failed to update db with nexmo"})
+			else {
+				req.body.phoneverified = true;
+				req.body.phoneNumberVerified = true;
+				res.status(296).json({result: req.body, token: req.body.token, message: "success"})
+			}
+		});
+	} 
+	catch(error) {
+		res.status(401).json({result:error.message, message: "failed to update db with nexmo"})
+	}
+}
+
+
+
+
+
 
 
 

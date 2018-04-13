@@ -127,7 +127,7 @@
   </div>
   
   <iron-ajax id="ajaxNewEmail" method="PUT" handle-as="json" content-type="application/json" on-response="availableEmail"></iron-ajax>
-  <iron-ajax id="ajaxSignUp" method="POST" handle-as="json" content-type="application/json" on-response="checkSMSSent"></iron-ajax>
+  <iron-ajax id="ajaxSignUp" method="POST" handle-as="json" content-type="application/json" on-response="userAddedResponse"></iron-ajax>
   <iron-ajax id="ajaxRecaptcha" method="POST" handle-as="json" content-type="application/json" on-response=""></iron-ajax>
 
   </template>
@@ -1133,7 +1133,13 @@
                   "name": "Zimbabwe"
                 }
               ]
-          }
+          },
+          user: {
+            type: Object,
+            notify: true,
+            reflectToAttribute: true,
+            value: {}
+          },
         }
       }
 
@@ -1260,16 +1266,29 @@
       //   this.$.ajaxRecaptcha.generateRequest();
       // }
 
-      checkSMSSent(resp) {
+      userAddedResponse(resp) {
         console.log(resp.detail.response)
-        if(resp.detail.response["textSent"] === "success") {
-          Object.keys(this.formData).map(k => this.set("formData.`${key}`", ""))
-          console.log("is formData empty?", this.formData)
-          this.set("formData", {})
+
+        var res = resp.detail.response
+
+
+        if(resp.detail.response["message"] === "success sign up") {  
+
+
+          // Object.keys(this.formData).map(k => this.set("formData.`${key}`", ""))
+          this.set("user", res.result)
+          this.set("user.token", res.token)
+          // this.set("formData", {})
+
+          
+
+          Object.keys(this.formData).map(k => this.set("formData[`${key}`]", ""))
+
           this.dispatchEvent(new CustomEvent("pageChange", {
             detail: {
               selection: "two-factor",
-              email: resp.detail.response.result["email"]
+              email: res.result["email"],
+              // user: resp.detail.response.result
             }
           }))
         }

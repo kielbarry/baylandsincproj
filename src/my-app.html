@@ -192,12 +192,12 @@
           <poloniex-view name="poloniex-view"></poloniex-view>
           <coinbase-view name="coinbase-view"></coinbase-view>
           <log-in name="log-in"></log-in>
-          <sign-up id="signUp" name="sign-up"></sign-up>
+          <sign-up id="signUp" name="sign-up" user="{{user}}"></sign-up>
           <coin-price-comparison 
           name="coin-price-comparison" all-exchange-prices="{{allExchangePrices}}">
           </coin-price-comparison>
 
-          <two-factor id="twoFactor" name="two-factor" verify-user-phone="{{verifyUserPhone}}"></two-factor>
+          <two-factor id="twoFactor" name="two-factor" verify-user-phone="{{verifyUserPhone}}" user="{{user}}"></two-factor>
 
           <view-404 name="view-404"></view-404>
         </iron-pages>
@@ -272,7 +272,13 @@
               value: {
                 email: "",
               }
-          }
+          },
+          user: {
+            type: Object,
+            notify: true,
+            reflectToAttribute: true,
+            value: {}
+          },
 
         };
       }
@@ -357,8 +363,8 @@
         this.$.signUp.addEventListener("pageChange", (e)=> {
           this.set("routeData.page", e.detail.selection);
           this.set("verifyUserPhone.email", e.detail.email)
+          console.log("user in my app", this.user)
         })
-
       }
 
 

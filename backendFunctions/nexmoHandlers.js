@@ -25,7 +25,6 @@ const
 
 
 
-
 module.exports = {
 	signUp,
 	cancel,
@@ -34,34 +33,14 @@ module.exports = {
 
 async function signUp(req, res) {
 	nexmo.verify.request({number: req.body.phoneNumber, brand: "Kiel Barry"}, async function (err, result) {
-	  if(err || result.error_text) { console.error(err || result.error_text); }
+	  if(err || result.error_text) { 
+	  	console.error(err || result.error_text); 
+	  	res.json({"result": err, "message": "failed to send sms"})
+	  }
 	  else {
 	    redisClient.set(req.body.email, result.request_id)
-	    res.json({"result": req.body, "textSent": "success"})
+	    auth.createUser(req, res)
 	  }
-
-
-	  auth.createUser(req, res)
-
-	// var u = req.body
-	// console.log("here is u in sign up", u)
-
- // 	bcrypt.hash(req.body.password, salt, async function(err, hash) {
-	//   	try{
-	// 		await client.connect();
-	// 		var res = await client.query(`INSERT INTO users (id, 
-	// 			versionid, createdat, firstname, lastname, 
-	// 			fullname, email, passwordHash, activationCode, 
-	// 			emailVerified, phoneVerified) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11",`, [...user]);
-	// 			await client.end();
-	// 	} 
-	// 	catch(error) {
-	// 		console.log(error)
-	// 	}
-	// });
-
-
-
 	});
 };
 
@@ -69,9 +48,12 @@ function cancel(req, res) {
 	redisClient.get(req.body.email, function(err, reply) {
 	    if(err) res.sendStatus(400)
 		nexmo.verify.control({request_id: reply, cmd: 'cancel'}, function(err, result) {
-		  if(err || result.error_text) { console.error(err, result.error_text); }
+		  if(err)  res.json({"result": err, "textCanceled": "failure"})
+		  else if(!result.error_text) {
+		  	res.json({"result": req.body, "textCanceled": "success"})
+		  } 
 		  else {
-		   res.json({"result": req.body, "textCanceled": "success"})
+		   res.json({"result": result.error_text, "textCanceled": "failure"})
 		  }
 		});
 	});
@@ -80,11 +62,26 @@ function cancel(req, res) {
 function verify(req, res) {
 	redisClient.get(req.body.email, function(err, reply) {
 	    if(err) res.sendStatus(400)
-		nexmo.verify.check({request_id: reply, code: req.body.nexmoCode}, function(err, result) {
-		  if(err || result.error_text) { console.error(err || result.error_text); }
+		nexmo.verify.check({request_id: reply, code: parseInt(req.body.nexmoCode)}, function(err, result) {
+		  if(err)  res.json({"result": err, message: "failure"})
+		  else if(!result.error_text) {
+		  	auth.verifyNexmo(req, res)
+		  }
 		  else {
-		   res.json({"result": req.body, "textVerified": "success"})
+		  	res.json({"result": result.error_text, message: "failure"})
 		  }
 		});
 	});
 }
+
+
+
+
+
+
+
+
+
+
+
+
