@@ -33,6 +33,7 @@ const
 
 module.exports = {
 	check: checkAuth,
+	login,
 	createUser,
 	verifyNexmo
 }
@@ -110,7 +111,39 @@ async function verifyNexmo(req, res, next) {
 	}
 }
 
+async function login(req, res, next) {
 
+	try{
+
+  		const client = new pg.Client(conn);
+
+		await client.connect();
+		var pgresult = await client.query(`SELECT * FROM users WHERE email=$1 ORDER BY versionid LIMIT 1`, [req.body.email]);
+
+		await client.end((err) => {
+			if(err) res.status(401).json({result:err, message: "failure"});
+			else {
+				models.user =  pgresult.rows[0]
+				bcrypt.compare(req.body.password, models.user.passwordhash, function(err, result) {
+					if(err || !result) res.status(401).json({message: "auth failure"});
+				    else {
+				    	const t = jwt.sign({email: req.body.email, id: req.body._id}, 
+				    		jwtToken,
+				    		{expiresIn: "2 days"});
+				    	models.user.token = t;
+				    	models.user.passwordhash = "";
+				    	// return 
+				    	res.status(200).json({result: models.user,message: "success", token: t}, );
+				    }
+				});
+			}
+		});
+	} 
+	catch(error) {
+		res.status(401).json({result:error.message, message: "failed to connect"})
+	}
+
+}
 
 
 

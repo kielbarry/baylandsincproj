@@ -29,7 +29,7 @@ module.exports = {
 	signUp,
 	cancel,
 	verify,
-	getNewCode
+	getNewNexmoCode
 }
 
 async function signUp(req, res) {
@@ -75,7 +75,7 @@ function verify(req, res) {
 	});
 }
 
-function getNewCode(req, res) {
+function getNewNexmoCode(req, res) {
 	nexmo.verify.request({number: req.body.phoneNumber, brand: "Kiel Barry"}, async function (err, result) {
 	  if(err || result.error_text) { 
 	  	console.error(err || result.error_text); 

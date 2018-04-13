@@ -45,6 +45,7 @@
 <link rel="lazy-import" href="sign-up.html">
 <link rel="lazy-import" href="two-factor.html">
 <link rel="lazy-import" href="landing-page.html">
+<link rel="lazy-import" href="profile-page.html">
 
 <dom-module id="my-app">
   <template>
@@ -83,12 +84,38 @@
       #main-title {
         font-family: "CursiveFont";
       }
+  
+      .user-sign-in {
+        position: absolute;
+        right: 20px;
+        top: 25%;
+        bottom: 25%;
+        margin: auto;
+      }
 
-      .user-sign-in > a {
+    
+      .user-sign-in > a
+      {
         color: #faf4db;
         font-size: 14px;
         fill: #fff;
       }
+
+      .profile-page {
+        position: absolute;
+        right: 20px;
+        top: 25%;
+        bottom: 25%;
+        margin: auto;
+      }
+
+      .profile-page > a
+       {
+        color: #faf4db;
+        font-size: 14px;
+        fill: #fff;
+      }
+    
 
       .drawer-list {
         margin: 0 20px;
@@ -139,60 +166,83 @@
 
     <app-drawer-layout fullbleed narrow="{{narrow}}">
       <!-- Drawer content -->
-      <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
-        <app-toolbar>Menu</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="over-view" href="[[rootPath]]over-view">Overview</a>
-          <iron-list items="[[pageList]]" as="page">
-            <template>
-              <a name="[[page.name]]" href="[[rootPath]][[page.path]]"> {{ page.title }}</a>
-            </template>
-          </iron-list>'
-        </iron-selector>
-      </app-drawer>
-
+      <div style="display: [[authenticated.postauth]]">
+        <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
+          <app-toolbar>Menu</app-toolbar>
+          <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+            <a name="over-view" href="[[rootPath]]over-view">Overview</a>
+            <iron-list items="[[pageList]]" as="page">
+              <template>
+                <a name="[[page.name]]" href="[[rootPath]][[page.path]]"> {{ page.title }}</a>
+              </template>
+            </iron-list>'
+          </iron-selector>
+        </app-drawer>
+      </div>
       <!-- Main content -->
       <app-header-layout has-scrolling-region fullbleed>
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div id="main-title" main-title>Prosophia</div>
+            <div id="main-title" main-title>
+            Prosophia
+            </div>
+            <div style="display: [[authenticated.preauth]]">
+              <div class="user-sign-in layout horizontal">  
+                <a name="log-in" href="[[rootPath]]log-in">Log In 
+                  <paper-icon-button icon="icons:perm-identity"></paper-icon-button>
+                </a>
+                <span> | </span>
+                <a name="sign-up" style="padding-left: 16px;" href="[[rootPath]]sign-up"> Register 
+                  <paper-icon-button icon="social:person-add"></paper-icon-button>
+                </a>
+              </div>
+            </div>
+            <div style="display: [[authenticated.postauth]]">
+              <div class="profile-page layout horizontal">  
+                <a name="profile-page" href="[[rootPath]]profile-page">Profile
+                  <paper-icon-button icon="icons:perm-identity"></paper-icon-button>
+                </a>
+                <span> | </span>
+                <a name="log-out" style="padding-left: 16px; text-decoration: underline;" href="#" on-click="logOut"> 
+                Log out 
+                  <paper-icon-button icon="social:person-add"></paper-icon-button>
+                </a>
+              </div>
+            </div>
 
-            <div class="user-sign-in layout horizontal">
-              <a name="log-in" href="[[rootPath]]log-in">Log In 
-                <paper-icon-button icon="icons:perm-identity"></paper-icon-button>
-              </a>
-              <div> | </div>
-              <a name="sign-up" style="padding-left: 16px" href="[[rootPath]]sign-up"> Register 
-                <paper-icon-button icon="social:person-add"></paper-icon-button>
-              </a>
+
             </div>
           </app-toolbar>
         </app-header>
 
-
-        <paper-tabs class="tab-navigation" selected="0" scrollable>
-          <paper-tab style="margin-right:50px">
-            <a class="mainTabs" name="dashboard" href="[[rootPath]][[parentView]]">
-              Dashboard
-              <iron-icon icon="editor:multiline-chart"></iron-icon>
-            </a>
-          </paper-tab>
-          <paper-tab>
-            <a class="mainTabs" name="coin-price-comparison" href="[[rootPath]]coin-price-comparison">
-              Coin Price Comparison
-              <iron-icon icon="icons:list"></iron-icon>
-            </a>
-          </paper-tab>
-        </paper-tabs>
-
+        <div style="display: [[authenticated.postauth]]">
+          <paper-tabs class="tab-navigation" selected="0" scrollable>
+            <paper-tab style="margin-right:50px">
+              <a class="mainTabs" name="dashboard" href="[[rootPath]][[parentView]]">
+                Dashboard
+                <iron-icon icon="editor:multiline-chart"></iron-icon>
+              </a>
+            </paper-tab>
+            <paper-tab>
+              <a class="mainTabs" name="coin-price-comparison" href="[[rootPath]]coin-price-comparison">
+                Coin Price Comparison
+                <iron-icon icon="icons:list"></iron-icon>
+              </a>
+            </paper-tab>
+          </paper-tabs>
+        </div>
 
         <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view-404" role="main">
           <over-view name="over-view"></over-view>
           <poloniex-view name="poloniex-view"></poloniex-view>
           <coinbase-view name="coinbase-view"></coinbase-view>
-          <log-in name="log-in"></log-in>
+          <log-in id="logIn" name="log-in"></log-in>
           <sign-up id="signUp" name="sign-up" user="{{user}}"></sign-up>
+
+          <profile-page id="profilePage" name="profile-page" user="{{user}}"></profile-page>
+          <!-- <log-out id="logOut" name="log-out"></log-in> -->
+
           <coin-price-comparison 
           name="coin-price-comparison" all-exchange-prices="{{allExchangePrices}}">
           </coin-price-comparison>
@@ -279,6 +329,21 @@
             reflectToAttribute: true,
             value: {}
           },
+          isAuth: {
+            type: Boolean, 
+            notify: true,
+            reflectToAttribute: true,
+            value: false
+          },
+          authenticated: {
+            type: Object,
+            notify: true,
+            reflectToAttribute: true,
+            value: {
+              "preauth": "block",
+              "postauth": "none"
+            }
+          }
 
         };
       }
@@ -353,6 +418,14 @@
         this.page = 'view-404';
       }
 
+      logOut(e){
+        console.log("here in logout")
+        this.set("isAuth", false);
+        this.set("authenticated.preauth", "block");
+        this.set("authenticated.postauth", "none");
+        this.set("user", {})
+      }
+
 
       
       ready(){
@@ -360,11 +433,29 @@
 
         this.getMinAndMaxCoinPrice();
 
-        this.$.signUp.addEventListener("pageChange", (e)=> {
+        this.$.logIn.addEventListener("pageChange", (e)=> {
+          console.log("e.detail here in login myapp", e.detail)
+          this.set("isAuth", true);
+          this.set("authenticated.preauth", "none");
+          this.set("authenticated.postauth", "block");
           this.set("routeData.page", e.detail.selection);
           this.set("verifyUserPhone.email", e.detail.email)
-          console.log("user in my app", this.user)
         })
+        this.$.signUp.addEventListener("pageChange", (e)=> {
+          this.set("isAuth", true);
+          this.set("authenticated.preauth", "none");
+          this.set("authenticated.postauth", "block");
+          this.set("routeData.page", e.detail.selection);
+          this.set("verifyUserPhone.email", e.detail.email)
+        })
+        this.$.twoFactor.addEventListener("pageChange", (e)=> {
+          this.set("isAuth", true);
+          this.set("authenticated.preauth", "none");
+          this.set("authenticated.postauth", "block");
+          this.set("routeData.page", e.detail.selection);
+          this.set("verifyUserPhone.email", e.detail.email)
+        })
+
       }
 
 

@@ -1,0 +1,48 @@
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="profile-page">
+  <template>
+    <style include="shared-styles iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+
+      .card {
+        width: 35%;
+        margin: 0 auto;
+      }
+
+    </style>
+
+    <div class="card">
+      nothing to see here yet
+    </div>
+
+
+  </template>
+
+  <script>
+    class ProfilePage extends Polymer.Element {
+      static get is() { return 'profile-page'; }
+
+      static get properties() {
+        return {
+        }
+      }
+
+      constructor() {
+        super();
+      }
+
+
+      ready(){
+        super.ready();
+      }
+
+    }
+
+    window.customElements.define(ProfilePage.is, ProfilePage);
+  </script>
+</dom-module>

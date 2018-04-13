@@ -53,7 +53,7 @@
       </div>
     </div>
 
-   <iron-ajax id="ajaxLogIn" method="POST" handle-as="json" content-type="application/json" on-response="authenticate"></iron-ajax>
+   <iron-ajax id="ajaxLogIn" method="PUT" handle-as="json" content-type="application/json" on-response="authenticate"></iron-ajax>
 
 
   </template>
@@ -89,6 +89,12 @@
               'disabledbutton' : true,
             },
           },
+          user: {
+            type: Object,
+            notify: true,
+            reflectToAttribute: true,
+            value: {}
+          }
         }
       }
 
@@ -113,9 +119,9 @@
 
       logIn() {
         if(this.userInput.email && this.userInput.password) {
-          this.$.ajaxSignUp.url = "/login"
-          this.$.ajaxSignUp.body = JSON.stringify(this.userInput);
-          this.$.ajaxSignUp.generateRequest();
+          this.$.ajaxLogIn.url = "/login"
+          this.$.ajaxLogIn.body = JSON.stringify(this.userInput);
+          this.$.ajaxLogIn.generateRequest();
         }
       }
       enableButton(){
@@ -129,8 +135,27 @@
         }
       }
 
-      authenticate() {
-        console.log("nothing here yet") 
+      authenticate(resp) {
+
+        var res = resp.detail.response
+
+
+        this.set("user", resp.detail.response.result)
+        console.log(res.message)
+        if(res.message === "success") {
+          console.log("inside res.message === 'success'")
+          this.dispatchEvent(new CustomEvent("pageChange", {
+            detail: {
+              selection: "over-view",
+              email: res.result["email"],
+              // user: resp.detail.response.result
+            }
+          }))
+        }
+        else {
+          console.log("dont have a response for an error yet")
+        }
+
       }
 
 

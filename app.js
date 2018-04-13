@@ -84,15 +84,7 @@ app.put("/getNewNexmoCode", (req, res) => {
 
 app.put("/login", (req, res) => {
 	if(!req.body) return res.sendStatus(400)
-	bcrypt.compare(req.body.password, hash, function(err, result) {
-		if(err || !result) res.status(401).json({message: "auth failure"});
-	    else {
-	    	const t = jwt.sign({email: req.body.email, id: req.body._id}, 
-	    		jwtToken,
-	    		{expiresIn: "2 days"});
-	    	return res.status(200).json({message: "auth successful", token: t}, );
-	    }
-	});
+	checkAuth.login(req,res);
 })
 
 

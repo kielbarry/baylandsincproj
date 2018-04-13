@@ -20,6 +20,9 @@
       #timer {
         color: red;
       }
+      .buttons {
+        width: 100%;
+      }
 
 
 
@@ -28,7 +31,7 @@
     <div class="card">
       <div class="layout vertical">
         <div>
-          A code has been sent via SMS to your phone number. Please enter that code below. Two factor authentication is required to register an account. Your code will be valid for the remaining <p id="timer">{{ timer }}<p> minutes.
+          A code has been sent via SMS to your phone number. Please enter that code below. Two factor authentication is required to register an account. Your code will be valid for the remaining <span id="timer">{{ timer }}<span> minutes.
         </div>
         <div>
           <paper-input label="SMS Code *" auto-validate pattern="^[0-9]+$" error-message="Your code should only container numbers" value="{{ verifyUserPhone.nexmoCode }}"></paper-input>
@@ -36,10 +39,10 @@
 
         <paper-spinner active style="display: [[d.spinner]]; margin: 0 auto;"></paper-spinner>
          <div class="layout horizontal" style="margin-top:15px">
-          <paper-button raised on-tap="getNewCode" disabled="[[d.getNewCode]]">
+          <paper-button class="buttons" style="margin-right: auto" raised on-tap="getNewCode" disabled="[[d.getNewCode]]">
             Request New Code
           </paper-button>
-          <paper-button raised on-tap="validateNexmoCode" disabled="[[d.submitButton]]">
+          <paper-button class="buttons" raised on-tap="validateNexmoCode" disabled="[[d.submitButton]]">
             Submit
           </paper-button>
         </div>
@@ -118,20 +121,20 @@
       }
 
       timerFunction(){
-        this.set("d.getNewCode", false);
+        this.set("d.getNewCode", true);
         var countdown = new Date().getTime();
         var stop = setInterval(() => {
           var currDiff = countdown - new Date().getTime();
-          var seconds = Math.floor(12+(currDiff/1000) % 60).toString();
-          var minutes = Math.floor(1+(currDiff/1000/60) % 60 );
+          var seconds = Math.floor(59+(currDiff/1000) % 60).toString();
+          var minutes = Math.floor(5+(currDiff/1000/60) % 60 );
 
           if(parseInt(seconds) < 10) seconds = seconds.padStart(2, 0);
 
           this.set("timer", minutes + ":" + seconds);
-          console.log(this.timer)
 
           if(parseInt(seconds) < 1 && minutes < 1) {
             this.set("timer", "0:00");
+            this.set("d.getNewCode", '');
             this.set("d.getNewCode", false);
             clearInterval(stop)
           }
@@ -140,30 +143,44 @@
 
 
       validateNexmoCode() {
-        console.log("this.user in validateNexmoCode", this.user)
         this.$.ajaxTwoFactor.url = "/verifyNexmo"
         this.$.ajaxTwoFactor.body = JSON.stringify(this.user);
         this.$.ajaxTwoFactor.generateRequest();
       }
 
       nexmoVerification(resp) {
-        this.set("user.nexmoCode", "");
-        this.set("user.phoneNumberVerified", true)
-        console.log("here is response", resp.detail.response)
+
+        var res = resp.detail.response
+
+        if(res.message === "success") {
+          this.set("user.nexmoCode", "");
+          this.set("user.phoneNumberVerified", true)
+          this.dispatchEvent(new CustomEvent("pageChange", {
+              detail: {
+                selection: "over-view",
+                email: res.result["email"],
+                // user: resp.detail.response.result
+              }
+            }))
+          }
+          else {
+            console.log("need to add fail condition")
+          }
       }
-      GetNewCode() {
-        this.$.ajaxTwoFactor.url = "/getNewNexmoCode"
-        this.$.ajaxTwoFactor.body = JSON.stringify(this.user);
-        this.$.ajaxTwoFactor.generateRequest();
+      getNewCode() {
+        this.$.ajaxGetNewCode.url = "/getNewNexmoCode"
+        this.$.ajaxGetNewCode.body = JSON.stringify(this.user);
+        this.$.ajaxGetNewCode.generateRequest();
       }
       newCodeSent(resp){
+        console.log(resp.detail.response)
         this.timerFunction();
         this.set("d.getNewCode", false);    
       }
 
 
-      authenticate() {
-        console.log("nothing here yet") 
+      authenticate(resp) {
+        console.log("nothing here yet", resp.detail.response) 
       }
 
 
