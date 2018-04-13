@@ -17,6 +17,9 @@
         top: 22px;
         margin-left: auto;
       }
+      #timer {
+        color: red;
+      }
 
 
 
@@ -25,22 +28,27 @@
     <div class="card">
       <div class="layout vertical">
         <div>
-          A code has been sent via SMS to your phone number. Please enter that code below. Two factor authentication is required to register an account.
+          A code has been sent via SMS to your phone number. Please enter that code below. Two factor authentication is required to register an account. Your code will be valid for the remaining <p id="timer">{{ timer }}<p> minutes.
         </div>
         <div>
           <paper-input label="SMS Code *" auto-validate pattern="^[0-9]+$" error-message="Your code should only container numbers" value="{{ verifyUserPhone.nexmoCode }}"></paper-input>
         </div>
 
         <paper-spinner active style="display: [[d.spinner]]; margin: 0 auto;"></paper-spinner>
-
-        <paper-button raised on-tap="validateNexmoCode" disabled="[[d.submitButton]]">
-          Submit
-        </paper-button>
+         <div class="layout horizontal" style="margin-top:15px">
+          <paper-button raised on-tap="getNewCode" disabled="[[d.getNewCode]]">
+            Request New Code
+          </paper-button>
+          <paper-button raised on-tap="validateNexmoCode" disabled="[[d.submitButton]]">
+            Submit
+          </paper-button>
+        </div>
 
       </div>
     </div>
 
    <iron-ajax id="ajaxTwoFactor" method="PUT" handle-as="json" content-type="application/json" on-response="nexmoVerification"></iron-ajax>
+   <iron-ajax id="ajaxGetNewCode" method="PUT" handle-as="json" content-type="application/json" on-response="newCodeSent"></iron-ajax>
 
 
   </template>
@@ -67,6 +75,7 @@
               value: {
                 spinner: "none",
                 submitButton: true,
+                getNewCode: true
               }
             },
             user: {
@@ -109,10 +118,23 @@
       }
 
       timerFunction(){
+        this.set("d.getNewCode", false);
         var countdown = new Date().getTime();
-        setInterval(() => {
-          this.set("timer", countdown - new Date().getTime());
+        var stop = setInterval(() => {
+          var currDiff = countdown - new Date().getTime();
+          var seconds = Math.floor(12+(currDiff/1000) % 60).toString();
+          var minutes = Math.floor(1+(currDiff/1000/60) % 60 );
+
+          if(parseInt(seconds) < 10) seconds = seconds.padStart(2, 0);
+
+          this.set("timer", minutes + ":" + seconds);
           console.log(this.timer)
+
+          if(parseInt(seconds) < 1 && minutes < 1) {
+            this.set("timer", "0:00");
+            this.set("d.getNewCode", false);
+            clearInterval(stop)
+          }
         }, 1000);
       }
 
@@ -128,6 +150,15 @@
         this.set("user.nexmoCode", "");
         this.set("user.phoneNumberVerified", true)
         console.log("here is response", resp.detail.response)
+      }
+      GetNewCode() {
+        this.$.ajaxTwoFactor.url = "/getNewNexmoCode"
+        this.$.ajaxTwoFactor.body = JSON.stringify(this.user);
+        this.$.ajaxTwoFactor.generateRequest();
+      }
+      newCodeSent(resp){
+        this.timerFunction();
+        this.set("d.getNewCode", false);    
       }
 
 

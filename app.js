@@ -78,6 +78,10 @@ app.put("/verifyNexmo", (req, res) => {
 	nexmoHandler.verify(req, res)
 })
 
+app.put("/getNewNexmoCode", (req, res) => {
+	nexmoHandler.getNewNexmoCode(req, res)
+})
+
 app.put("/login", (req, res) => {
 	if(!req.body) return res.sendStatus(400)
 	bcrypt.compare(req.body.password, hash, function(err, result) {

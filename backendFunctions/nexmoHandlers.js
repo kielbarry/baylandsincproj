@@ -28,7 +28,8 @@ const
 module.exports = {
 	signUp,
 	cancel,
-	verify
+	verify,
+	getNewCode
 }
 
 async function signUp(req, res) {
@@ -71,6 +72,18 @@ function verify(req, res) {
 		  	res.json({"result": result.error_text, message: "failure"})
 		  }
 		});
+	});
+}
+
+function getNewCode(req, res) {
+	nexmo.verify.request({number: req.body.phoneNumber, brand: "Kiel Barry"}, async function (err, result) {
+	  if(err || result.error_text) { 
+	  	console.error(err || result.error_text); 
+	  	res.json({"result": err, "message": "failed to send sms"})
+	  }
+	  else {
+	    redisClient.set(req.body.email, result.request_id)
+	  }
 	});
 }
 
