@@ -47,6 +47,8 @@ async function initQuery() {
 		ETH DOUBLE PRECISION,
 		LTC DOUBLE PRECISION,
 		BCH DOUBLE PRECISION,
+		USD DOUBLE PRECISION,
+		UNIQUE(userid, userversionid),
 		FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid)
 	);
 
@@ -60,6 +62,7 @@ async function initQuery() {
 		ETH DOUBLE PRECISION,
 		LTC DOUBLE PRECISION,
 		BCH DOUBLE PRECISION,
+		USD DOUBLE PRECISION,
 		FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid)
 	);
 `	// data stored on backend, no sqlinjection anticipated

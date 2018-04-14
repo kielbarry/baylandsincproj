@@ -16,9 +16,9 @@ module.exports = {
 }
 
 async function getExchangeHoldings(req, res, next) {
-	// if(req.body.apiInfo.exchange === "coinbase") {
+	if(req.body.apiInfo.exchange === "coinbase") {
 		return await getCoinbaseHoldings(req, res, next)
-	// }
+	}
 }
 
 async function getCoinbaseHoldings(req, res, next) {

@@ -43,6 +43,9 @@ client.connect()
 initDb.initQuery();
 
 
+// handler.getExchangeHoldings();
+
+
 
 app
 	.use(bodyParser.json())

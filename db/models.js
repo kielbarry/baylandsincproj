@@ -17,6 +17,7 @@ module.exports = {
             'phoneNumber': '',
             'emailverified': '',
             'phoneNumberVerified': '',
+            'balances': []
 
       },
       exchanges,
