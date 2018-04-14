@@ -1,7 +1,8 @@
 const 
-https = require('https'),
-axios = require('axios'),
-coinbase = require('coinbase');
+	https = require('https'),
+	axios = require('axios'),
+	coinbase = require('coinbase'),
+	qs = require("./userQueries.js");
 
 
 module.exports = {
@@ -14,14 +15,14 @@ module.exports = {
 	getExchangeHoldings
 }
 
-async function getExchangeHoldings(req) {
-	if(req.body.exchange === "coinbase") {
-		return await getCoinbaseHoldings(req)
-	}
+async function getExchangeHoldings(req, res, next) {
+	// if(req.body.apiInfo.exchange === "coinbase") {
+		return await getCoinbaseHoldings(req, res, next)
+	// }
 }
 
-async function getCoinbaseHoldings(req) {
-	cbclient = new coinbase.Client({'apiKey': req.body["apiKey"], 'apiSecret': req.body["apiSecret"]})
+async function getCoinbaseHoldings(req, res, next) {
+	cbclient = new coinbase.Client({'apiKey': req.body.apiInfo["apiKey"], 'apiSecret': req.body.apiInfo["apiSecret"]})
 	let cb = {
 		coinname: '',
 		coinamount: '',
@@ -29,26 +30,33 @@ async function getCoinbaseHoldings(req) {
 		usdbalance: '',
 		exchange: '',
 	}
-	var bitPrice = await cbclient.getBuyPrice({'currencyPair': 'BTC-USD'}, function(err, obj) {
-		return obj.data.amount;
-	});
-	await cbclient.getAccounts({}, (err, accounts) => {
-		if(err) return err
+
+	var bitPrice 
+
+	await cbclient.getBuyPrice({'currencyPair': 'BTC-USD'}, async (err, obj)=> bitPrice = obj.data.amount);
+
+	await cbclient.getAccounts({}, async (err, acts) => {		
+		if(err) res.status(401).json({result: err})
 		else {
-			var arr = accounts.map(acct => {
-				cb.coinname = acct.currency;
-				cb.coinamount = acct.balance.amount;
-				cb.coinvalue = parseFloat(bitPrice) / parseFloat(acct.native_balance.amount);
-				cb.usdbalance = acct.native_balance.amount;
-				cb.exchange = "Coinbase"
-				return cb
-			})
+			// acts.map((acct, i) => {
+			// 	// cb.coinvalue = parseFloat(bitPrice) / parseFloat(acct.native_balance.amount);
+			// 	cb.coinvalue = parseFloat(acct.native_balance.amount);
+			// 	cb.coinname = acct.currency;
+			// 	cb.coinamount = acct.balance.amount;
+			// 	cb.usdbalance = acct.native_balance.amount;
+			// 	cb.exchange = "Coinbase";
+			// 	// console.log(cb)
+			// 	// userAccounts[i] = cb
+			// 	return cb
+			// })
+			// try {
+				qs.addCoinbaseBalances(req, res, acts, next)
+			// }
+			// catch (error) {
+			// }
 		}
-	}).then((arr) => {
-		console.log(arr)
 	})
 }
-
 
 async function getGDAXPrices(){
 	var obj = {};

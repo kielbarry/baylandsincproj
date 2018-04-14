@@ -43,6 +43,7 @@ client.connect()
 initDb.initQuery();
 
 
+
 app
 	.use(bodyParser.json())
 	.use(bodyParser.urlencoded({ extended : true }))
@@ -91,12 +92,15 @@ app.put("/login", (req, res) => {
 
 app.put("/getBalances", (req, res) => {
 	if (!req.body) return res.sendStatus(400)
-	handler.getExchangeHoldings(req).then(resp => res.send(resp))
+	handler.getExchangeHoldings(req, res)
+
+// .then(resp => res.send(resp))
 })
 
 app.get("/getMinAndMaxCoinPrice", (req, res) => {
+
 	// console.log(handler.getGDAXPrices());
-	handler.getPoloniexPrices().then(e=>console.log(e))
+	// handler.getPoloniexPrices().then(e=>console.log(e))
 	// handler.getKrakenPrices();
 	// handler.getBinancePrices().then(e=>console.log(e))
 
