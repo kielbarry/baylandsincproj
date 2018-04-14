@@ -26,6 +26,7 @@
     "nexmo": "^2.2.0",
     "path": "^0.12.7",
     "pg": "^7.4.1",
+    "poloniex-api-node": "^1.8.1",
     "redis": "^2.8.0",
     "redis-cli": "^1.0.2",
     "request": "^2.85.0",

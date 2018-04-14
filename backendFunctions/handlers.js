@@ -1,7 +1,12 @@
+require("dotenv").config();
+
 const 
 	https = require('https'),
 	axios = require('axios'),
 	coinbase = require('coinbase'),
+	Poloniex = require('poloniex-api-node'),
+	mypolkey = process.env.polAPIK,
+	mypolsecret = process.env.polAPIS,
 	qs = require("./userQueries.js");
 
 
@@ -19,44 +24,57 @@ async function getExchangeHoldings(req, res, next) {
 	if(req.body.apiInfo.exchange === "coinbase") {
 		return await getCoinbaseHoldings(req, res, next)
 	}
+	else if(req.body.apiInfo.exchange === "gdax") {
+		return await getGdaxHoldings(req, res, next)
+	}
+	else if(req.body.apiInfo.exchange === "poloniex") {
+		return await getPoloniexHoldings(req, res, next)
+	}
 }
 
 async function getCoinbaseHoldings(req, res, next) {
 	cbclient = new coinbase.Client({'apiKey': req.body.apiInfo["apiKey"], 'apiSecret': req.body.apiInfo["apiSecret"]})
-	let cb = {
-		coinname: '',
-		coinamount: '',
-		coinvalue:'',
-		usdbalance: '',
-		exchange: '',
-	}
 
 	var bitPrice 
 
 	await cbclient.getBuyPrice({'currencyPair': 'BTC-USD'}, async (err, obj)=> bitPrice = obj.data.amount);
 
 	await cbclient.getAccounts({}, async (err, acts) => {		
-		if(err) res.status(401).json({result: err})
-		else {
-			// acts.map((acct, i) => {
-			// 	// cb.coinvalue = parseFloat(bitPrice) / parseFloat(acct.native_balance.amount);
-			// 	cb.coinvalue = parseFloat(acct.native_balance.amount);
-			// 	cb.coinname = acct.currency;
-			// 	cb.coinamount = acct.balance.amount;
-			// 	cb.usdbalance = acct.native_balance.amount;
-			// 	cb.exchange = "Coinbase";
-			// 	// console.log(cb)
-			// 	// userAccounts[i] = cb
-			// 	return cb
-			// })
-			// try {
-				qs.addCoinbaseBalances(req, res, acts, next)
-			// }
-			// catch (error) {
-			// }
-		}
+		err ? res.status(401).json({result: err, message: "failure"}) : qs.addCoinbaseBalances(req, res, acts, next)
 	})
 }
+
+async function getGdaxHoldings(req, res, next) {
+	console.log("not yet build")
+}
+
+async function getPoloniexHoldings(req, res, next) {
+
+	// let poloniex = new Poloniex(req.body.apiInfo["apiKey"], req.body.apiInfo["apiSecret"], { socketTimeout: 15000 });
+	let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
+
+	var bitPrice = await poloniex.returnTicker()
+
+	// console.log(bitprice["USDT_BTC"].lowestAsk)
+
+	// poloniex.returnTicker()
+	// .then(balances => {
+	// 	btcPrice = balances.USDT_BTC.lowestAsk
+	// }).catch(err => console.log(err.message))
+
+	try {
+		poloniex.returnCompleteBalances().then((balances) => {
+			qs.addPoloniexBalances(req, res, balances, bitPrice)
+		})
+	}
+	catch(error) {
+		res.status(401).json({result: error, message: "failure"})
+	}
+
+
+
+}
+
 
 async function getGDAXPrices(){
 	var obj = {};
