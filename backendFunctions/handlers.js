@@ -51,7 +51,10 @@ async function getGdaxHoldings(req, res, next) {
 async function getPoloniexHoldings(req, res, next) {
 
 	let poloniex = new Poloniex(req.body.apiInfo["apiKey"], req.body.apiInfo["apiSecret"], { socketTimeout: 15000 });
+
 	// let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
+
+	// poloniex.on(err => res.status(401).json({result: error, message: "failure"}))
 
 	// console.log(bitprice["USDT_BTC"].lowestAsk)
 
@@ -62,7 +65,6 @@ async function getPoloniexHoldings(req, res, next) {
 	var bitPrice = await poloniex.returnTicker()
 
 	try {
-		
 		poloniex.returnCompleteBalances().then((balances) => {
 			qs.addPoloniexBalances(req, res, balances, bitPrice)
 		})
