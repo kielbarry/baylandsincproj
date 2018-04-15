@@ -208,7 +208,8 @@
         this.$.getBalances.generateRequest();
       }
 
-      success(response) {
+      success(resp) {
+        console.log(resp.detail.response)
         this.set("d.spinner", "none")
         this.set("d.input", "block")
 
@@ -220,7 +221,7 @@
         this.set("d.success", "success")
 
         console.log(this.apiInfo)
-        console.log("response in success ", response.detail.data)
+        // console.log("response in success ", response.detail.data)
       }
       // setInfo(e) {
       //   if(e.path[1].id = )

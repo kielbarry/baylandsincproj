@@ -63,6 +63,7 @@ async function initQuery() {
 		LTC DOUBLE PRECISION,
 		BCH DOUBLE PRECISION,
 		USD DOUBLE PRECISION,
+		UNIQUE(userid, userversionid),
 		FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid)
 	);
 `	// data stored on backend, no sqlinjection anticipated
@@ -78,7 +79,7 @@ async function initQuery() {
 
 	models.poloniexListings.map(coin => str2 += (" " + coin + " DOUBLE PRECISION,"));
 
-	str2 += " FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid));"
+	str2 += "UNIQUE(userid, userversionid), FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid));"
 
 	str += str2
 

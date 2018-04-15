@@ -38,7 +38,7 @@ async function addCoinbaseBalances(req, res, bal, next) {
 			else {
 				models.user = req.body.user;
 				if(!models.user.balances) {
-					models.user.balances = []
+					models.user.balances = {}
 				}
 				if(!models.user.pages) {
 					models.user.pages = []
@@ -94,67 +94,49 @@ async function addPoloniexBalances(req, res, bal, bitPrice, next) {
 		i != (len-1) ? str2 += "$" + (i+5) + ", " : str2 += "$" + (i+5)
 	})
 
-
 	var str3 = "";
-
-	//move this into above obejct.keys
 	str1.split(", ").map((coin,i ) => {
 		i != (len-1) ? str3 +=  coin + "=$" + (i+5) + ", " : str3 +=  coin + "=$" + (i+5)
 	})
 
 
-	console.log("here")
-	var s = [...[...Object.keys(objects)].map(x => objects[x]["value"])]
-
-	console.log(s)
-	res.status(200).json({message: "hit the spot"})
+	// var s = [...Object.keys(objects)].map(x => objects[x]["value"])
 
 	try{
   		const client = new pg.Client(conn);
 		await client.connect();
 		var pgresult = await client.query(`INSERT INTO poloniexlistings (
 			versionid, userid, userversionid, createdat,` + 
-			str1+ `)` + ` VALUES(` + 
+			str1+ `)` + ` VALUES($1, $2, $3, $4,` + 
 			str2 + `) ON CONFLICT (userid, userversionid) DO UPDATE 
  			SET versionid=(poloniexlistings.versionid::INT +1)::VARCHAR, ` +
  			str3 , [
-			0, req.body.user.id, req.body.user.versionid, new Date(),
-			[...[...Object.keys(objects)].map(x => objects[x]["value"])]]);
+			0, req.body.user.id, req.body.user.versionid, new Date(), 
+			...[...Object.keys(objects)].map(x => objects[x]["value"])
+			]);
 
 		await client.end((err) => {
 			if(err) res.status(401).json({result:err, message: "failure"});
 			else {
-
-				//fixing but something like this
-				// models.user.balances.some(x => {
-				// 	if(x["coinbase"]) {
-				// 		models.user.balances[x]["coinbase"] = obj
-				// 	}
-				// })
-
-
+				models.user = req.body.user;
+				if(!models.user.balances) {
+					models.user.balances = {}
+				} 
 				if(!models.user.pages) {
 					models.user.pages = []
 				}
 				if(!models.user.pages.includes("poloniex")) {
 					models.user.pages.push("poloniex")
 				}
-
-				// models.user = req.body.user;
-				// if(!models.user.balances) {
-				// 	models.user.balances = []
-				// } 
-				// models.user.balances.push({"coinbase": obj})
-				// models.user.createdat = pgresult.rows.createdat
-				// res.status(296).json({result: models.user, token: req.body.user.token, message: "success"})
+				models.user.balances["poloniex"] = objects
+				models.user.createdat = pgresult.rows.createdat
+				res.status(296).json({result: models.user, token: req.body.user.token, message: "success"})
 			}
 		});
 	} 
 	catch(error) {
 		res.status(401).json({result:error.message, message: "failure"})
 	}
-	// console.log("HEREEEEEEEE", arr)
-	// res.status(200).json({result: arr, message: "hit the spot"})
 }
 
 
