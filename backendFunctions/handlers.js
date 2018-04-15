@@ -53,16 +53,16 @@ async function getPoloniexHoldings(req, res, next) {
 	let poloniex = new Poloniex(req.body.apiInfo["apiKey"], req.body.apiInfo["apiSecret"], { socketTimeout: 15000 });
 	// let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
 
-	var bitPrice = await poloniex.returnTicker()
-
 	// console.log(bitprice["USDT_BTC"].lowestAsk)
 
 	// poloniex.returnTicker()
 	// .then(balances => {
 	// 	btcPrice = balances.USDT_BTC.lowestAsk
 	// }).catch(err => console.log(err.message))
+	var bitPrice = await poloniex.returnTicker()
 
 	try {
+		
 		poloniex.returnCompleteBalances().then((balances) => {
 			qs.addPoloniexBalances(req, res, balances, bitPrice)
 		})

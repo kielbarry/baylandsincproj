@@ -61,16 +61,44 @@ async function addPoloniexBalances(req, res, bal, bitPrice, next) {
 	var btcPrice = bitPrice["USDT_BTC"].lowestAsk
 	console.log("btcprice", btcPrice)
 
-	let arr = Object.keys(bal).filter(key => {
+	let arr = [];
+
+	//NEED TO UPDATE TABLE WITH ALL COINS, NOT JUST MINE
+
+	Object.keys(bal).filter(key => {
 		let po = {}
-	  	if(bal[key].available > 0){
-	  		po[key] = (parseFloat(bal[key].btcValue) * parseFloat(btcPrice)).toFixed(2);
-	  		console.log(po[key])
-	  		return po
-	  	}
+	  	// if(bal[key].available > 0){
+	  		po[key] = {
+	  			"value" : (parseFloat(bal[key].btcValue) * parseFloat(btcPrice)).toFixed(2),
+		  		"amount": bal[key].available
+		  	}
+	  		arr.push(po)
+	  	// }
 	})
-	console.log("HEREEEEEEEE", arr)
-	res.status(200).json({result: arr, message: "hit the spot"})
+
+	try{
+  		const client = new pg.Client(conn);
+		await client.connect();
+		var pgresult = await client.query(`INSERT INTO poloniexlistings ()`, []);
+
+		await client.end((err) => {
+			if(err) res.status(401).json({result:err, message: "failure"});
+			else {
+				// models.user = req.body.user;
+				// if(!models.user.balances) {
+				// 	models.user.balances = []
+				// } 
+				// models.user.balances.push({"coinbase": obj})
+				// models.user.createdat = pgresult.rows.createdat
+				// res.status(296).json({result: models.user, token: req.body.user.token, message: "success"})
+			}
+		});
+	} 
+	catch(error) {
+		res.status(401).json({result:error.message, message: "failure"})
+	}
+	// console.log("HEREEEEEEEE", arr)
+	// res.status(200).json({result: arr, message: "hit the spot"})
 }
 
 
