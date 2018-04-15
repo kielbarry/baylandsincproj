@@ -97,12 +97,17 @@ async function addPoloniexBalances(req, res, bal, bitPrice, next) {
 
 	var str3 = "";
 
+	//move this into above obejct.keys
 	str1.split(", ").map((coin,i ) => {
 		i != (len-1) ? str3 +=  coin + "=$" + (i+5) + ", " : str3 +=  coin + "=$" + (i+5)
 	})
-	console.log(str3)
 
-	console.log(...[...objects["amount"]])
+
+	console.log("here")
+	var s = [...[...Object.keys(objects)].map(x => objects[x]["value"])]
+
+	console.log(s)
+	res.status(200).json({message: "hit the spot"})
 
 	try{
   		const client = new pg.Client(conn);
@@ -114,7 +119,7 @@ async function addPoloniexBalances(req, res, bal, bitPrice, next) {
  			SET versionid=(poloniexlistings.versionid::INT +1)::VARCHAR, ` +
  			str3 , [
 			0, req.body.user.id, req.body.user.versionid, new Date(),
-			...[...objects]["amount"]]);
+			[...[...Object.keys(objects)].map(x => objects[x]["value"])]]);
 
 		await client.end((err) => {
 			if(err) res.status(401).json({result:err, message: "failure"});

@@ -50,9 +50,9 @@ async function getGdaxHoldings(req, res, next) {
 
 async function getPoloniexHoldings(req, res, next) {
 
-	let poloniex = new Poloniex(req.body.apiInfo["apiKey"], req.body.apiInfo["apiSecret"], { socketTimeout: 15000 });
+	// let poloniex = new Poloniex(req.body.apiInfo["apiKey"], req.body.apiInfo["apiSecret"], { socketTimeout: 15000 });
 
-	// let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
+	let poloniex = new Poloniex(mypolkey, mypolsecret, { socketTimeout: 15000 });
 
 	// poloniex.on(err => res.status(401).json({result: error, message: "failure"}))
 
