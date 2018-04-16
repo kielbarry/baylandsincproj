@@ -258,7 +258,10 @@
           <!-- <log-out id="logOut" name="log-out"></log-in> -->
 
           <coin-price-comparison 
-          name="coin-price-comparison" all-exchange-prices="{{allExchangePrices}}">
+          name="coin-price-comparison" 
+          all-exchange-prices="{{allExchangePrices}}" 
+          parent-view="[[parentView]]"
+          user="{{user}}" > 
           </coin-price-comparison>
 
           <two-factor id="twoFactor" name="two-factor" verify-user-phone="{{verifyUserPhone}}" user="{{user}}"></two-factor>
@@ -378,15 +381,19 @@
       }
 
       updateCoinPriceList(resp){
-        console.log(resp.detail.response)
         this.set("allExchangePrices", resp.detail.response)
         console.log("this.in myapp", this.allExchangePrices)
+        Object.keys(this.allExchangePrices.minAndMaxList).map(x=> {
+          if (x === "NAV" || x === "NAV") {
+            console.log("HERLKASN:FLGJNFAS:LFKJAS:LKFJSA:LK")
+          }
+        })
+        // console.log(this.allExchangePrices["NAV"])
+
       }
 
 
       _routePageChanged(page) {
-
-        console.log("here is app-route",page)
 
         this.page = page || 'over-view';
         // Close a non-persistent drawer when the page & route are changed.
@@ -397,17 +404,14 @@
 
       _pageChanged(page) {
 
-        console.log("page", page)
-
 
         var resolvedPageUrl;
 
         if(page.includes("-view")) { 
           // this.set("parentView", page.split("-")[0])
           this.set("parentView", page)
+          this.notifyPath("parentView")
         }
-
-        console.log("parentView", this.parentView)
 
         // if(this.parentView !== "" && page !== "coin-price-comparison") {
         //   resolvedPageUrl = this.resolveUrl(this.parentView + '.html');
@@ -417,8 +421,6 @@
         // }
 
         // var resolvedPageUrl = this.resolveUrl(page + '.html');
-
-        console.log("resolvedPageUrl", resolvedPageUrl)
 
         Polymer.importHref(
             resolvedPageUrl,
@@ -433,7 +435,6 @@
       }
 
       logOut(e){
-        console.log("here in logout")
         this.set("isAuth", false);
         this.set("authenticated.preauth", "block");
         this.set("authenticated.postauth", "none");
@@ -441,7 +442,6 @@
       }
 
       closeMenu(){
-        console.log(this.$.drawer)
         this.$.drawer.toggle();
         // this.$.testing.resetLayout()
       }
@@ -455,9 +455,6 @@
 
         this.$.logIn.addEventListener("pageChange", (e)=> {
 
-          console.log("this.user in my-app login", this.user)
-
-          console.log("e.detail here in login myapp", e.detail)
           this.set("isAuth", true);
           this.set("authenticated.preauth", "none");
           this.set("authenticated.postauth", "block");

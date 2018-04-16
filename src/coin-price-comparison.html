@@ -3,12 +3,14 @@
 <link rel="import" href="../webcomponents/panels/exchanges-panel.html">
 <link rel="import" href="../webcomponents/panels/enter-api-panel.html">
 
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+
 
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="coin-price-comparison">
   <template>
-    <style include="shared-styles">
+    <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
 
@@ -23,11 +25,47 @@
       <div class="circle">3</div>
       <h1 style="color: blue">COIN PRICE COMPARISON</h1>
       
-      there shouldnt really be anything here
+      {{parentView}}
+
+
+      <div class="layout horizontal">
+        <!-- <div class="container sums"> -->
+          <div class="left">
+            <div>{{summaryStats.maxValue}}</div>
+          </div>
+          <div class="mid">
+            <div>{{summaryStats.totalValue}}</div>
+          </div>
+          <div class="right">
+            <div>{{summaryStats.minValue}}</div>
+          </div>
+        <!-- </div> -->
+      </div>
+
 
       
-      <paper-icon-button icon="icons:add-circle" on-tap="openExchangesList">
-      </paper-icon-button>
+      <iron-list items="[[coinList]]" as="coin">
+        <template>
+          <div class="layout horizontal">
+            <div class="container">
+              <div class="left">
+                <div>{{coin.max.exchange}}</div>
+                <div>{{coin.max.price}}</div>
+              </div>
+              <div class="mid">
+                <div>{{coin.name}}</div>
+                <div>{{coin.value}}</div>
+              </div>
+              <div class="right">
+                <div>{{coin.min.exchange}}</div>
+                <div>{{coin.min.price}}</div>
+              </div>
+            </div>
+
+          </div>
+        </template>
+      </iron-list>
+
     </div>
 
     <app-drawer id="drawer" align="right">
@@ -48,14 +86,96 @@
             reflectToAttribute: true,
             notify: true,
           },
+          parentView: {
+            type: String,
+            reflectToAttribute: true,
+            notify: true,
+            value: ""
+          },
+          user: {
+            type: Object,
+            reflectToAttribute: true,
+            notify: true,
+            value: {}
+          },
+          coinList: {
+            type: Array,
+            reflectToAttribute: true,
+            notify: true,
+            value: []
+          },
+          summaryStats: {
+            type: Object,
+            reflectToAttribute: true,
+            notify: true,
+            value: {
+              maxValue: "",
+              totalValue: "",
+              minValue: "",
+            }
+          },
 
         }
       }
 
       static get observers(){
         return [
-          "exchangeDataUpdate(all)"
+          "exchangeDataUpdate(all)",
+          "parentViewChange(parentView)"
         ]
+      }
+
+      parentViewChange(p) {
+        
+        console.log("allExchangePrices", this.allExchangePrices)
+
+        var page
+        if(p != "over-view" && p != "landing-page") {
+          page = p.split("-")[0]
+          this.set("p", "")
+        }
+        if(this.user.balances[page]){
+          this.setList(this.user.balances[page])
+        }
+      }
+
+      setList(bal){
+        var sorted = Object.keys(bal).sort((a,b) => {
+          return parseFloat(bal[a].value) < parseFloat(bal[b].value)
+        })
+        this.set("coinList", [])
+        var arr = [] 
+        arr = sorted.map((x,i) => {
+           return {
+            "name": x, 
+            "value": bal[x].value, 
+            "max": {
+              "exchange": this.allExchangePrices.minAndMaxList[x].max.exchange,
+              "price": this.allExchangePrices.minAndMaxList[x].max.price
+            },
+            "min": {
+              "exchange": this.allExchangePrices.minAndMaxList[x].min.exchange,
+              "price": this.allExchangePrices.minAndMaxList[x].min.price
+            }
+          }
+        })
+
+
+       var total =  arr.reduce((acc,x) => {
+          acc += x.value
+        })
+        var max =  arr.reduce((acc,x) => {
+          acc += x.max.price
+        })
+        var min =  arr.reduce((acc,x) => {
+          acc += x.min.price
+        })
+        this.set("summaryStats.totalValue", total)
+        this.set("summaryStats.maxValue", max)
+        this.set("summaryStats.minValue", min)
+
+
+        this.set("coinList", arr)
       }
 
       exchangeDataUpdate(all) {
@@ -68,10 +188,6 @@
 
       ready(){
         super.ready();
-
-        console.log("answer in ready", this.allExchangePrices)
-        console.log("this.dollar", this.$)
-
       }
 
     }

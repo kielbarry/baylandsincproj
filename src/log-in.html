@@ -140,15 +140,9 @@
       }
 
       authenticate(resp) {
-
         var res = resp.detail.response
-
-
         this.set("user", resp.detail.response.result)
-        console.log("this.suser in authenticate resp", this.user)
-        console.log(res.message)
         if(res.message === "success") {
-          console.log("inside res.message === 'success'")
           this.dispatchEvent(new CustomEvent("pageChange", {
             detail: {
               selection: "over-view",
@@ -160,7 +154,6 @@
         else {
           console.log("dont have a response for an error yet")
         }
-
       }
 
 

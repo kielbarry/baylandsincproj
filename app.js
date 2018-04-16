@@ -108,8 +108,8 @@ app.get("/getMinAndMaxCoinPrice", (req, res) => {
 	// handler.getBinancePrices().then(e=>console.log(e))
 
 	// repeater(getAllandSend(res), 10000)
-	// handler.getAllPrices().then(resp => {
-	// 	res.send(resp)
-	// })
+	handler.getAllPrices().then(resp => {
+		res.send(resp)
+	})
 	// .then(e => console.log(e["poloniex"]))
 });

@@ -194,38 +194,25 @@
       }
 
       getBalances() {
-
         this.set("d.spinner", "block")
         this.set("d.input", "none")
         this.set('db', true)
         this.notifyPath("db")
-
-
-        
-
         this.$.getBalances.url = "/getBalances"
         this.$.getBalances.body = JSON.stringify({apiInfo:this.apiInfo, user: this.user});
         this.$.getBalances.generateRequest();
       }
 
       success(resp) {
-        console.log(resp.detail.response)
+        var res = resp.detail.response
         this.set("d.spinner", "none")
         this.set("d.input", "block")
-
         Object.keys(this.apiInfo).map(key =>{
           this.set(`apiInfo.${key}`, "")
         })
-
-
         this.set("d.success", "success")
-
-        console.log(this.apiInfo)
-        // console.log("response in success ", response.detail.data)
+        this.user.balances = res.result.balances
       }
-      // setInfo(e) {
-      //   if(e.path[1].id = )
-      // }
 
       ready(){
         super.ready();
