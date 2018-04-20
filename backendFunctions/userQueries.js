@@ -12,7 +12,34 @@ const
 module.exports = {
 	addCoinbaseBalances,
 	addGdaxBalances,
-	addPoloniexBalances
+	addPoloniexBalances,
+	getAllUserHoldings,
+}
+
+async function getAllUserHoldings(req, res) {
+
+	console.log("inside userqueries", req.params)
+	var balances = {
+		coinbase: '',
+		poloniex: '',
+		gdax: ''
+	}
+
+	try {
+		const client = new pg.Client(conn);
+		await client.connect();
+		balances[coinbase] = await client.query('SELECT * FROM coinbaselistings WHERE userid=$1 and versionid=$2', req.params.id, req.params.versionid)
+		balances[poloniex] = await client.query('SELECT * FROM poloniexlistings WHERE userid=$1 and versionid=$2', req.params.id, req.params.versionid)
+		balances[gdax] = await client.query('SELECT * FROM gdaxlistings WHERE userid=$1 and versionid=$2', req.params.id, req.params.versionid)
+		await client.end(err => {
+			if(err) {
+				res.status(401).json({result:err, message: "failure"})
+			}
+		})
+	} 
+	catch(error) {
+		res.status(401).json({result:error.message, message: "failure"})
+	}
 }
 
 
@@ -37,15 +64,11 @@ async function addCoinbaseBalances(req, res, bal, next) {
 			if(err) res.status(401).json({result:err, message: "failure"});
 			else {
 				models.user = req.body.user;
-				if(!models.user.balances) {
-					models.user.balances = {}
-				}
-				if(!models.user.pages) {
-					models.user.pages = []
-				}
-				if(!models.user.pages.includes("coinbase")) {
-					models.user.pages.push("coinbase")
-				}
+
+				if(!models.user.balances) models.user.balances = {}
+				if(!models.user.pages) models.user.pages = []
+				if(!models.user.pages.includes("coinbase")) models.user.pages.push("coinbase")
+					
 				models.user.balances["coinbase"] = obj;
 				models.user.createdat = pgresult.rows.createdat
 				res.status(296).json({result: models.user, token: req.body.user.token, message: "success"})
@@ -99,18 +122,15 @@ async function addPoloniexBalances(req, res, bal, bitPrice, next) {
 		i != (len-1) ? str3 +=  coin + "=$" + (i+5) + ", " : str3 +=  coin + "=$" + (i+5)
 	})
 
-
-	// var s = [...Object.keys(objects)].map(x => objects[x]["value"])
-
 	try{
   		const client = new pg.Client(conn);
 		await client.connect();
-		var pgresult = await client.query(`INSERT INTO poloniexlistings (
+		var pgresult = await client.query(` INSERT INTO poloniexlistings (
 			versionid, userid, userversionid, createdat,` + 
 			str1+ `)` + ` VALUES($1, $2, $3, $4,` + 
 			str2 + `) ON CONFLICT (userid, userversionid) DO UPDATE 
  			SET versionid=(poloniexlistings.versionid::INT +1)::VARCHAR, ` +
- 			str3 , [
+ 			str3, [
 			0, req.body.user.id, req.body.user.versionid, new Date(), 
 			...[...Object.keys(objects)].map(x => objects[x]["value"])
 			]);
@@ -119,15 +139,11 @@ async function addPoloniexBalances(req, res, bal, bitPrice, next) {
 			if(err) res.status(401).json({result:err, message: "failure"});
 			else {
 				models.user = req.body.user;
-				if(!models.user.balances) {
-					models.user.balances = {}
-				} 
-				if(!models.user.pages) {
-					models.user.pages = []
-				}
-				if(!models.user.pages.includes("poloniex")) {
-					models.user.pages.push("poloniex")
-				}
+
+				if(!models.user.balances) models.user.balances = {}
+				if(!models.user.pages) models.user.pages = []
+				if(!models.user.pages.includes("poloniex")) models.user.pages.push("poloniex")
+
 				models.user.balances["poloniex"] = objects
 				models.user.createdat = pgresult.rows.createdat
 				res.status(296).json({result: models.user, token: req.body.user.token, message: "success"})

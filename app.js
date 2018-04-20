@@ -100,6 +100,13 @@ app.put("/getBalances", (req, res) => {
 // .then(resp => res.send(resp))
 })
 
+app.get("/getAllHoldings/:id/:versionid", (req, res) => {
+	if (!req.body) return res.sendStatus(400)
+
+	console.log(req.params.id, req.params.versionid)
+
+})
+
 app.get("/getMinAndMaxCoinPrice", (req, res) => {
 
 	// console.log(handler.getGDAXPrices());

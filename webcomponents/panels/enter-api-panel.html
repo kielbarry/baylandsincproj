@@ -108,6 +108,8 @@
 
         </div>
 
+  <button on-click="getAllHoldings"></button>
+
         <div id="successTag" class$="d.success">
             Success test
           </div>
@@ -205,6 +207,10 @@
 
       success(resp) {
         var res = resp.detail.response
+        console.log(resp)
+        if(res.result.message === "failure") {
+          console.log("here inside")
+        }
         this.set("d.spinner", "none")
         this.set("d.input", "block")
         Object.keys(this.apiInfo).map(key =>{
@@ -212,6 +218,15 @@
         })
         this.set("d.success", "success")
         this.user.balances = res.result.balances
+        console.log("copy me", this.user)
+
+        this.getAllHoldings()
+      }
+
+      getAllHoldings() {
+        this.$.getAllHoldings.url = "/getAllHoldings/" + this.user.id + "/" + this.user.versionid;
+        // this.$.getAllHoldings.body = JSON.stringify({user: this.user});
+        this.$.getAllHoldings.generateRequest(); 
       }
 
       ready(){

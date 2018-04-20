@@ -26,8 +26,10 @@ async function initQuery() {
 		passwordHash varchar(64) NOT NULL,
 		emailverified BOOLEAN,
 		phoneverified BOOLEAN,
+		exchanges varchar(64),
 		CONSTRAINT singleversion UNIQUE(id, versionid)
 	);
+
 	CREATE INDEX IF NOT EXISTS email_idx ON users (lower(email));
 	CREATE INDEX IF NOT EXISTS full_name_idx ON users (lower(fullname));
 
@@ -35,6 +37,7 @@ async function initQuery() {
 		id INTEGER PRIMARY KEY,
 		exchange NAME
 	);
+	
 	CREATE INDEX IF NOT EXISTS exchange_idx ON exchanges (lower(exchange));
 	
 	CREATE TABLE IF NOT EXISTS coinbaselistings (
@@ -83,17 +86,19 @@ async function initQuery() {
 
 	str += str2
 
-	str3 = 	`CREATE TABLE IF NOT EXISTS usersexchanges (
-		id SERIAL PRIMARY KEY NOT NUll,
-		versionid varchar(64) NOT NULL,
-		userid INTEGER NOT NULL,
-		userversionid varchar(64) NOT NULL,
-		createdat DATE,`
-	models.exchanges.map((x, i) => str3 += x + " BOOLEAN,")
+	// str3 = 	`CREATE TABLE IF NOT EXISTS usersexchanges (
+	// 	id SERIAL PRIMARY KEY NOT NUll,
+	// 	versionid varchar(64) NOT NULL,
+	// 	userid INTEGER NOT NULL,
+	// 	userversionid varchar(64) NOT NULL,
+	// 	createdat DATE,`
+	// models.exchanges.map((x, i) => str3 += x + " BOOLEAN,")
 
-	str3 += " FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid));" 
+	// str3 += " FOREIGN KEY (userid, userversionid) REFERENCES users(id, versionid));" 
 
-	str += str3
+	// str += str3
+
+
 
 
 	try{

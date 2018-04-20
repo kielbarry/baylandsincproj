@@ -281,6 +281,9 @@
 
     <iron-ajax id="getMinAndMaxCoinPrice" method="GET" handle-as="json" on-response="updateCoinPriceList" content-type="application/json"></iron-ajax>
 
+     <iron-ajax id="getAllHoldings" method="GET" handle-as="json" on-response="success" content-type="application/json"></iron-ajax>
+    
+
 
   </template>
 
@@ -344,8 +347,282 @@
             type: Object,
             notify: true,
             reflectToAttribute: true,
-            value: {}
+            value: {
+              "id": 1,
+              "versionid": "0",
+              "createdat": "2018-04-12T07:00:00.000Z",
+              "firstname": "fadsf",
+              "lastname": "asdfa",
+              "fullname": "fadsf asdfa",
+              "email": "kiel.j.barry@gmail.com",
+              "phonenumber": "19254873101",
+              "passwordhash": "",
+              "emailverified": false,
+              "phoneverified": true,
+              "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImtpZWwuai5iYXJyeUBnbWFpbC5jb20iLCJpYXQiOjE1MjM5Mjg4MjksImV4cCI6MTUyNDEwMTYyOX0.V27tqjtXg-kUW2xh7yJ1vrhfyfW7_r0lwmk89of7iNE",
+              "balances": {
+                "poloniex": {
+                  "AMP": {
+                    "value": "2.12",
+                    "amount": "7.52090509"
+                  },
+                  "ARDR": {
+                    "value": "2.84",
+                    "amount": "9.04099159"
+                  },
+                  "BCH": {
+                    "value": "47.37",
+                    "amount": "0.06161809"
+                  },
+                  "BCN": {
+                    "value": "2.05",
+                    "amount": "530.25000000"
+                  },
+                  "BCY": {
+                    "value": "0.97",
+                    "amount": "2.68785981"
+                  },
+                  "BELA": {
+                    "value": "1.59",
+                    "amount": "16.36274114"
+                  },
+                  "BLK": {
+                    "value": "1.59",
+                    "amount": "5.80802695"
+                  },
+                  "BTC": {
+                    "value": "0.00",
+                    "amount": "0.00000001"
+                  },
+                  "BTCD": {
+                    "value": "43.09",
+                    "amount": "0.73227905"
+                  },
+                  "BTS": {
+                    "value": "17.15",
+                    "amount": "79.17981981"
+                  },
+                  "BURST": {
+                    "value": "2.80",
+                    "amount": "132.56250000"
+                  },
+                  "CLAM": {
+                    "value": "5.66",
+                    "amount": "1.41159449"
+                  },
+                  "CVC": {
+                    "value": "0.91",
+                    "amount": "2.65474308"
+                  },
+                  "DASH": {
+                    "value": "0.55",
+                    "amount": "0.00151830"
+                  },
+                  "DCR": {
+                    "value": "12.48",
+                    "amount": "0.19947594"
+                  },
+                  "DGB": {
+                    "value": "2.46",
+                    "amount": "86.10897436"
+                  },
+                  "DOGE": {
+                    "value": "1.93",
+                    "amount": "419.78125000"
+                  },
+                  "EMC2": {
+                    "value": "19.17",
+                    "amount": "78.88881272"
+                  },
+                  "ETC": {
+                    "value": "0.68",
+                    "amount": "0.04162174"
+                  },
+                  "EXP": {
+                    "value": "0.90",
+                    "amount": "0.45406300"
+                  },
+                  "FCT": {
+                    "value": "1.03",
+                    "amount": "0.03861996"
+                  },
+                  "FLDC": {
+                    "value": "2.65",
+                    "amount": "149.39580420"
+                  },
+                  "FLO": {
+                    "value": "1.65",
+                    "amount": "21.78435016"
+                  },
+                  "GAME": {
+                    "value": "0.65",
+                    "amount": "0.40311900"
+                  },
+                  "GAS": {
+                    "value": "83.86",
+                    "amount": "4.17437028"
+                  },
+                  "GNO": {
+                    "value": "0.75",
+                    "amount": "0.00795282"
+                  },
+                  "GNT": {
+                    "value": "1.40",
+                    "amount": "3.44318182"
+                  },
+                  "GRC": {
+                    "value": "1.71",
+                    "amount": "37.46695724"
+                  },
+                  "HUC": {
+                    "value": "1.62",
+                    "amount": "14.16839533"
+                  },
+                  "LBC": {
+                    "value": "1.00",
+                    "amount": "4.02506992"
+                  },
+                  "LSK": {
+                    "value": "1.19",
+                    "amount": "0.11236617"
+                  },
+                  "MAID": {
+                    "value": "0.63",
+                    "amount": "1.86155765"
+                  },
+                  "NAV": {
+                    "value": "1.98",
+                    "amount": "1.76166719"
+                  },
+                  "NEOS": {
+                    "value": "0.72",
+                    "amount": "0.26373001"
+                  },
+                  "NMC": {
+                    "value": "0.89",
+                    "amount": "0.51723740"
+                  },
+                  "NXC": {
+                    "value": "0.74",
+                    "amount": "4.66855885"
+                  },
+                  "NXT": {
+                    "value": "6.64",
+                    "amount": "36.14631055"
+                  },
+                  "OMG": {
+                    "value": "1.54",
+                    "amount": "0.10322807"
+                  },
+                  "OMNI": {
+                    "value": "1.01",
+                    "amount": "0.03249919"
+                  },
+                  "PASC": {
+                    "value": "1.07",
+                    "amount": "1.33990558"
+                  },
+                  "PINK": {
+                    "value": "0.83",
+                    "amount": "39.04941861"
+                  },
+                  "POT": {
+                    "value": "4.45",
+                    "amount": "34.36325704"
+                  },
+                  "PPC": {
+                    "value": "0.91",
+                    "amount": "0.45498577"
+                  },
+                  "RADS": {
+                    "value": "1.06",
+                    "amount": "0.22140848"
+                  },
+                  "REP": {
+                    "value": "0.92",
+                    "amount": "0.03162740"
+                  },
+                  "RIC": {
+                    "value": "0.93",
+                    "amount": "11.05900110"
+                  },
+                  "SBD": {
+                    "value": "1.22",
+                    "amount": "0.54343546"
+                  },
+                  "SC": {
+                    "value": "2.93",
+                    "amount": "167.91250000"
+                  },
+                  "STEEM": {
+                    "value": "2.14",
+                    "amount": "0.85982180"
+                  },
+                  "STORJ": {
+                    "value": "2.28",
+                    "amount": "2.37022698"
+                  },
+                  "STR": {
+                    "value": "22.37",
+                    "amount": "78.74795150"
+                  },
+                  "STRAT": {
+                    "value": "0.89",
+                    "amount": "0.18428972"
+                  },
+                  "SYS": {
+                    "value": "21.03",
+                    "amount": "56.29832733"
+                  },
+                  "VIA": {
+                    "value": "1.05",
+                    "amount": "0.54461052"
+                  },
+                  "VRC": {
+                    "value": "0.93",
+                    "amount": "1.61506091"
+                  },
+                  "VTC": {
+                    "value": "65.67",
+                    "amount": "29.39234588"
+                  },
+                  "XBC": {
+                    "value": "0.37",
+                    "amount": "0.00923365"
+                  },
+                  "XCP": {
+                    "value": "0.70",
+                    "amount": "0.04391821"
+                  },
+                  "XEM": {
+                    "value": "2.54",
+                    "amount": "7.41193902"
+                  },
+                  "XMR": {
+                    "value": "74.85",
+                    "amount": "0.38431794"
+                  },
+                  "XPM": {
+                    "value": "3.65",
+                    "amount": "4.75224057"
+                  },
+                  "XRP": {
+                    "value": "200.65",
+                    "amount": "303.01485426"
+                  },
+                  "ZEC": {
+                    "value": "111.33",
+                    "amount": "0.49523664"
+                  },
+                  "ZRX": {
+                    "value": "2.98",
+                    "amount": "3.98526503"
+                  }
+                }
+              }
+            }
           },
+
           isAuth: {
             type: Boolean, 
             notify: true,
@@ -407,6 +684,12 @@
 
         var resolvedPageUrl;
 
+        //check auth of token
+        if(this.user.token) {
+
+        }
+
+
         if(page.includes("-view")) { 
           // this.set("parentView", page.split("-")[0])
           this.set("parentView", page)
@@ -450,8 +733,9 @@
       
       ready(){
         super.ready();
-
         this.getMinAndMaxCoinPrice();
+
+
 
         this.$.logIn.addEventListener("pageChange", (e)=> {
 

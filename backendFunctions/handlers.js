@@ -17,7 +17,7 @@ module.exports = {
 	getKrakenPrices,
 	getBinancePrices,
 	getMinAndMax,
-	getExchangeHoldings
+	getExchangeHoldings,
 }
 
 async function getExchangeHoldings(req, res, next) {
@@ -193,8 +193,6 @@ function getMinAndMax(obj) {
 	})
 	return minMaxList;
 }
-
-
 
 
 
